@@ -115,7 +115,7 @@ async function handleMention(
   // Both bots mentioned in one post: instance-impl runs every bot, so only the one matching
   // the post's language answers.
   const ourActorIds = new Set(
-    cfg.bots.map((bot) => session.context.getActorUri(bot.identifier).href),
+    cfg.bots.map((bot) => session.context.getActorUri(bot.handle).href),
   );
   const mentionsOfUs = message.mentions.filter(
     (mentioned) => mentioned.id != null && ourActorIds.has(mentioned.id.href),
@@ -136,7 +136,7 @@ async function handleMention(
     return;
   }
 
-  const botConfig = cfg.bots.find((bot) => bot.identifier === session.bot.identifier);
+  const botConfig = cfg.bots.find((bot) => bot.handle === session.bot.identifier);
   if (botConfig == null) return;
   const catalogue = catalogueFor(locale);
   const visibility = replyVisibility(message.visibility);

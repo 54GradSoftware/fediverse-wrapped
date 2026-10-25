@@ -33,7 +33,7 @@ function first<Item>(items: readonly Item[]): Item {
   return item;
 }
 const BOT = first(cfg.bots);
-const botActor = new URL(`/ap/actor/${BOT.identifier}`, cfg.origin);
+const botActor = new URL(`/ap/actor/${BOT.handle}`, cfg.origin);
 
 /** A mention from a stranger's server, with the calls the handler makes recorded. */
 function mention(
@@ -47,7 +47,7 @@ function mention(
   const replies: unknown[] = [];
   const session = {
     actorId: botActor,
-    bot: { identifier: BOT.identifier },
+    bot: { identifier: BOT.handle },
     context: { getActorUri: (id: string) => new URL(`/ap/actor/${id}`, cfg.origin) },
     follows: async () => {
       calls.push("follows");

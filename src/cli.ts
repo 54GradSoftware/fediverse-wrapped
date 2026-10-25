@@ -18,7 +18,7 @@ async function backend(): Promise<Backend> {
 function selectBots(bots: readonly BotBinding[], only: string | undefined): BotBinding[] {
   if (only == null) return [...bots];
   const found = bots.filter(
-    (binding) => binding.config.locale === only || binding.config.identifier === only,
+    (binding) => binding.config.locale === only || binding.config.handle === only,
   );
   if (found.length === 0) {
     throw new Error(
@@ -31,7 +31,7 @@ function selectBots(bots: readonly BotBinding[], only: string | undefined): BotB
 async function resolve(binding: BotBinding, account: string): Promise<Actor & { id: URL }> {
   const session = binding.bot.getSession(cfg.origin);
   const documentLoader = await session.context.getDocumentLoader({
-    identifier: binding.config.identifier,
+    identifier: binding.config.handle,
   });
   const object = await session.context.lookupObject(account, { documentLoader });
   if (!isActor(object) || object.id == null) {
@@ -85,9 +85,9 @@ class Follow extends AccountCommand {
         const actor = await resolve(binding, this.account);
         const handle = await handleOf(actor, this.account);
         await binding.bot.getSession(cfg.origin).follow(actor);
-        await db.addTestAccount(binding.config.identifier, actor.id.href, handle, Date.now());
+        await db.addTestAccount(binding.config.handle, actor.id.href, handle, Date.now());
         this.logger.success(
-          `${binding.config.identifier}: Follow sent to ${handle} — counts once accepted (node ace following)`,
+          `${binding.config.handle}: Follow sent to ${handle} — counts once accepted (node ace following)`,
         );
       }
     } finally {
@@ -106,9 +106,9 @@ class Unfollow extends AccountCommand {
       for (const binding of selectBots(bots, this.bot)) {
         const actor = await resolve(binding, this.account);
         await binding.bot.getSession(cfg.origin).unfollow(actor);
-        await db.removeTestAccount(binding.config.identifier, actor.id.href);
+        await db.removeTestAccount(binding.config.handle, actor.id.href);
         this.logger.success(
-          `${binding.config.identifier}: unfollowed ${await handleOf(actor, this.account)}`,
+          `${binding.config.handle}: unfollowed ${await handleOf(actor, this.account)}`,
         );
       }
     } finally {
@@ -131,7 +131,7 @@ class Following extends BaseCommand {
       }
       const table = this.ui.table().head(["bot", "account", "state", "added"]);
       for (const row of rows) {
-        const binding = bots.find((candidate) => candidate.config.identifier === row.bot);
+        const binding = bots.find((candidate) => candidate.config.handle === row.bot);
         const accepted =
           binding == null
             ? false

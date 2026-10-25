@@ -21,15 +21,21 @@ const timeZone =
   (key, value) =>
     assertTimeZone(key, value?.trim() || fallback);
 
-/** A bot identifier is part of every actor URI and can never change. */
-const identifier =
+const HANDLE_PATTERN = /^[a-z0-9_]{1,32}$/;
+
+/**
+ * The part of a bot's handle before @host, e.g. fediwrapped_de in @fediwrapped_de@host.
+ * It is part of every actor and object URI and can never change once federated.
+ * The display name is not configured here; it comes from the locales.
+ */
+const handle =
   (fallback: string): Validator<string> =>
   (key, value) => {
-    const id = value?.trim() || fallback;
-    if (!/^[a-z0-9_]{1,32}$/.test(id)) {
-      throw new Error(`${key} must match /^[a-z0-9_]{1,32}$/, got: ${id}`);
+    const name = value?.trim() || fallback;
+    if (!HANDLE_PATTERN.test(name)) {
+      throw new Error(`${key} must match ${HANDLE_PATTERN}, got: ${name}`);
     }
-    return id;
+    return name;
   };
 
 const int =
@@ -55,10 +61,8 @@ const rules = Env.rules({
   ORIGIN: Env.schema.string({ format: "url", protocol: true, tld: false }),
   PORT: int(8000, 1, 65535),
 
-  BOT_DE_ID: identifier("fediwrapped_de"),
-  BOT_EN_ID: identifier("fediwrapped_en"),
-  BOT_DE_USERNAME: optionalText(),
-  BOT_EN_USERNAME: optionalText(),
+  BOT_DE_HANDLE: handle("fediwrapped_de"),
+  BOT_EN_HANDLE: handle("fediwrapped_en"),
   BOT_DE_TIMEZONE: timeZone("Europe/Berlin"),
   BOT_EN_TIMEZONE: timeZone("UTC"),
 
@@ -112,31 +116,25 @@ if (originUrl.protocol !== "https:" && originUrl.hostname !== "localhost") {
 
 export type BotConfig = {
   readonly locale: Locale;
-  readonly identifier: string;
-  readonly username: string;
+  readonly handle: string;
   readonly timeZone: string;
 };
 
 const bots: readonly BotConfig[] = [
   {
     locale: "de",
-    identifier: env.BOT_DE_ID,
-    username: env.BOT_DE_USERNAME || env.BOT_DE_ID,
+    handle: env.BOT_DE_HANDLE,
     timeZone: env.BOT_DE_TIMEZONE,
   },
   {
     locale: "en",
-    identifier: env.BOT_EN_ID,
-    username: env.BOT_EN_USERNAME || env.BOT_EN_ID,
+    handle: env.BOT_EN_HANDLE,
     timeZone: env.BOT_EN_TIMEZONE,
   },
 ];
 
-if (bots[0]?.identifier === bots[1]?.identifier) {
-  throw new Error("BOT_DE_ID and BOT_EN_ID must differ");
-}
-if (bots[0]?.username === bots[1]?.username) {
-  throw new Error("BOT_DE_USERNAME and BOT_EN_USERNAME must differ");
+if (bots[0]?.handle === bots[1]?.handle) {
+  throw new Error("BOT_DE_HANDLE and BOT_EN_HANDLE must differ");
 }
 
 export const cfg = Object.freeze({
@@ -174,8 +172,8 @@ export const cfg = Object.freeze({
   testingMode: env.TESTING_MODE ?? false,
 });
 
-export function localeFor(identifier: string): Locale {
-  const bot = cfg.bots.find((candidate) => candidate.identifier === identifier);
-  if (bot == null) throw new Error(`no bot configured for identifier ${identifier}`);
+export function localeFor(handle: string): Locale {
+  const bot = cfg.bots.find((candidate) => candidate.handle === handle);
+  if (bot == null) throw new Error(`no bot configured for handle ${handle}`);
   return bot.locale;
 }

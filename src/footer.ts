@@ -28,7 +28,7 @@ const FALLBACK_IMPRINT = "https://54gradsoftware.de/impressum";
 /** A bot's own pages follow its language; the roster and the rest are German. */
 function localeOfPage(pathname: string): Locale {
   for (const bot of cfg.bots) {
-    const base = `/@${bot.username}`;
+    const base = `/@${bot.handle}`;
     if (pathname === base || pathname.startsWith(`${base}/`)) return bot.locale;
   }
   return "de";
@@ -45,7 +45,7 @@ function render(locale: Locale): string {
   const languages = cfg.bots
     .map((bot) =>
       fill(LANGUAGE_HTML, {
-        username: bot.username,
+        username: bot.handle,
         locale: bot.locale,
         label: catalogueFor(bot.locale).propLanguageValue,
       }),

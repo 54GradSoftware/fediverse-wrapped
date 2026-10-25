@@ -164,8 +164,8 @@ describe("footer", () => {
   });
 
   it("speaks the language of the bot whose page it is", async () => {
-    assert.match(await fetchPage(`/@${de!.username}`), /lang="de"/);
-    const html = await fetchPage(`/@${en!.username}/feed`);
+    assert.match(await fetchPage(`/@${de!.handle}`), /lang="de"/);
+    const html = await fetchPage(`/@${en!.handle}/feed`);
     assert.match(html, /<footer class="fw-footer" lang="en">/);
     assert.match(html, /href="https:\/\/fedw\.eu\/en\/"/);
     assert.match(html, /Questions or problems\?/);

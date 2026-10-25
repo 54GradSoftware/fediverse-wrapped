@@ -1,12 +1,7 @@
 // Fediverse Wrapped.
 
 import { mkdir, unlink } from "node:fs/promises";
-import {
-  configure,
-  getConsoleSink,
-  getJsonLinesFormatter,
-  getLogger,
-} from "@logtape/logtape";
+import { configure, getConsoleSink, getJsonLinesFormatter, getLogger } from "@logtape/logtape";
 import { serve } from "srvx";
 import { cfg } from "./config.ts";
 import { openDb } from "./db.ts";
@@ -48,10 +43,7 @@ const controller = new AbortController();
 const limiter = new HostLimiter();
 
 const sessions = new Map(
-  bots.map(({ config, bot }) => [
-    config.identifier,
-    bot.getSession(cfg.origin),
-  ]),
+  bots.map(({ config, bot }) => [config.handle, bot.getSession(cfg.origin)]),
 );
 const getSession = async (identifier: string) => {
   const session = sessions.get(identifier);
@@ -62,18 +54,17 @@ const getSession = async (identifier: string) => {
 // getDocumentLoader() SILENTLY falls back to unsigned without an RSA key pair, and every
 // authorized-fetch instance would answer 401. Checked once, loudly.
 for (const { config } of bots) {
-  const session = await getSession(config.identifier);
-  const keyPairs = await session.context.getActorKeyPairs(config.identifier);
+  const session = await getSession(config.handle);
+  const keyPairs = await session.context.getActorKeyPairs(config.handle);
   // ActorKeyPair extends the DOM lib's global CryptoKeyPair, invisible under @types/node.
   type KeyPairShape = { privateKey: { algorithm: { name: string } } };
   const hasRsa = keyPairs.some(
     (pair) =>
-      (pair as unknown as KeyPairShape).privateKey.algorithm.name ===
-      "RSASSA-PKCS1-v1_5",
+      (pair as unknown as KeyPairShape).privateKey.algorithm.name === "RSASSA-PKCS1-v1_5",
   );
   if (!hasRsa) {
     throw new Error(
-      `bot ${config.identifier} has no RSA key pair; signed fetches would silently fall back ` +
+      `bot ${config.handle} has no RSA key pair; signed fetches would silently fall back ` +
         "to unsigned and every authorized-fetch instance would refuse us",
     );
   }
@@ -90,10 +81,7 @@ if (cfg.testingMode) {
 const recovered = await db.recoverAfterCrash(Date.now());
 if (recovered.requeued > 0 || recovered.abandoned > 0) {
   // 'publishing' jobs are abandoned, never retried: the reply may already be out.
-  logger.warn(
-    "recovered after restart: {requeued} requeued, {abandoned} abandoned",
-    recovered,
-  );
+  logger.warn("recovered after restart: {requeued} requeued, {abandoned} abandoned", recovered);
 }
 
 const server = serve({
@@ -109,18 +97,12 @@ void instance.federation
   .startQueue(undefined, { signal: controller.signal })
   .catch((error) => logger.error("queue workers failed: {error}", { error }));
 
-void startWorkers(
-  { db, bots, getSession, limiter },
-  cfg.workers,
-  controller.signal,
-);
+void startWorkers({ db, bots, getSession, limiter }, cfg.workers, controller.signal);
 
 async function prune(): Promise<void> {
   try {
     const now = Date.now();
-    const expired = await db.expiredImages(
-      now - cfg.imageRetentionDays * DAY_MS,
-    );
+    const expired = await db.expiredImages(now - cfg.imageRetentionDays * DAY_MS);
     for (const id of expired) {
       await unlink(`${cfg.imageDir}/${id}.png`).catch(() => undefined);
     }
@@ -143,7 +125,7 @@ const pruneTimer = setInterval(() => void prune(), DAY_MS);
 for (const { config } of bots) {
   // One pre-formatted value: the text formatter would quote each interpolated string.
   logger.info("serving {handle}", {
-    handle: `@${config.username}@${cfg.canonicalHost} (${config.locale})`,
+    handle: `@${config.handle}@${cfg.canonicalHost} (${config.locale})`,
   });
 }
 logger.info("listening on :{port} for {origin}", {

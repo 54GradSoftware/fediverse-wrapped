@@ -51,7 +51,7 @@ the operator followed with `node ace follow @user@host`.
 Docker Compose on Coolify, both bots in one container. Production runs at
 `https://wrapped.fedw.eu`. All variables are explained in `.env.example`.
 
-> ⚠️ `ORIGIN`, `BOT_DE_ID` and `BOT_EN_ID` can never change after the first
+> ⚠️ `ORIGIN`, `BOT_DE_HANDLE` and `BOT_EN_HANDLE` can never change after the first
 > federation, and the `wrapped-data` volume (keys and followers) must be backed
 > up off the host. There is no migration path.
 

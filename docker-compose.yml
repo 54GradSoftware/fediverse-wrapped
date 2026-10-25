@@ -16,11 +16,8 @@ services:
       # IMMUTABLE after the first federation. See the warning box in README.md.
       # Typed by hand, never derived from a generated domain. Deploy fails if unset.
       - ORIGIN=${ORIGIN:?set ORIGIN, e.g. https://wrapped.fedw.eu}
-      - BOT_DE_ID=${BOT_DE_ID:-fediwrapped_de}
-      - BOT_EN_ID=${BOT_EN_ID:-fediwrapped_en}
-      # Changeable at any time.
-      - BOT_DE_USERNAME=${BOT_DE_USERNAME:-}
-      - BOT_EN_USERNAME=${BOT_EN_USERNAME:-}
+      - BOT_DE_HANDLE=${BOT_DE_HANDLE:-fediwrapped_de}
+      - BOT_EN_HANDLE=${BOT_EN_HANDLE:-fediwrapped_en}
       - DATA_DIR=/data
       # Secret, set once: openssl rand -hex 16. Changing it resets the daily limits.
       - ACTOR_SALT=${ACTOR_SALT:?set ACTOR_SALT to a random secret}

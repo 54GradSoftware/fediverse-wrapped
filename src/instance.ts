@@ -78,8 +78,8 @@ export function buildInstance(db: DatabaseSync, { consumeQueues = true } = {}) {
 
   const bots: BotBinding[] = cfg.bots.map((config) => {
     const catalogue = catalogueFor(config.locale);
-    const sibling = cfg.bots.find((bot) => bot.identifier !== config.identifier);
-    const siblingHandle = sibling == null ? "" : `@${sibling.username}@${cfg.canonicalHost}`;
+    const sibling = cfg.bots.find((bot) => bot.handle !== config.handle);
+    const siblingHandle = sibling == null ? "" : `@${sibling.handle}@${cfg.canonicalHost}`;
 
     const properties: Record<string, Text<"block" | "inline", void>> = {
       [catalogue.propLanguage]: plainText(catalogue.propLanguageValue),
@@ -91,10 +91,10 @@ export function buildInstance(db: DatabaseSync, { consumeQueues = true } = {}) {
 
     return {
       config,
-      // FROZEN FOREVER once federated: the identifier is part of every actor and object URI.
-      bot: instance.createBot(config.identifier, {
+      // FROZEN FOREVER once federated: the handle is part of every actor and object URI.
+      bot: instance.createBot(config.handle, {
         class: Service,
-        username: config.username,
+        username: config.handle,
         name: cfg.testingMode ? catalogue.botNameBeta : catalogue.botName,
         summary: catalogue.botSummary(
           siblingHandle,

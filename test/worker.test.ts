@@ -9,7 +9,7 @@ const { jobFailure, resolveActor, startWorkers } = await import("../src/worker.t
 const { OutboxError } = await import("../src/outbox.ts");
 const { Person } = await import("@fedify/vocab");
 
-const BOT = cfg.bots[0]!.identifier;
+const BOT = cfg.bots[0]!.handle;
 const ACTOR = "https://remote.test/users/alice";
 
 type Loaders = Parameters<typeof resolveActor>[2];
