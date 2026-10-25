@@ -1,24 +1,29 @@
-# Coolify: SERVICE_FQDN_WRAPPED_8000 generates the domain and routes to port 8000;
-# SERVICE_BASE64_SALT is a generated 32-char secret. Both bots share this one container.
+# Plain Compose, no Coolify magic variables. Coolify routes its domain to the exposed
+# port 8000 through its own domain and port fields. Both bots share this one container.
 services:
   wrapped:
     build: .
     restart: unless-stopped
+    # Not `ports:`. Nothing is published on the host; the proxy reaches the container
+    # directly. `expose` is what Coolify reads to accept 8000 in its port field.
+    expose:
+      - "8000"
     # No drain on shutdown; boot recovery re-queues interrupted jobs.
     stop_grace_period: 20s
     # Bounds the worst case of an enormous remote document.
     mem_limit: 768m
     environment:
-      - SERVICE_FQDN_WRAPPED_8000
       # IMMUTABLE after the first federation. See the warning box in README.md.
-      - ORIGIN=https://${SERVICE_FQDN_WRAPPED}
+      # Typed by hand, never derived from a generated domain. Deploy fails if unset.
+      - ORIGIN=${ORIGIN:?set ORIGIN, e.g. https://wrapped.fedw.eu}
       - BOT_DE_ID=${BOT_DE_ID:-fediwrapped_de}
       - BOT_EN_ID=${BOT_EN_ID:-fediwrapped_en}
       # Changeable at any time.
       - BOT_DE_USERNAME=${BOT_DE_USERNAME:-}
       - BOT_EN_USERNAME=${BOT_EN_USERNAME:-}
       - DATA_DIR=/data
-      - ACTOR_SALT=${SERVICE_BASE64_SALT}
+      # Secret, set once: openssl rand -hex 16. Changing it resets the daily limits.
+      - ACTOR_SALT=${ACTOR_SALT:?set ACTOR_SALT to a random secret}
       - BOT_DE_TIMEZONE=${BOT_DE_TIMEZONE:-Europe/Berlin}
       - BOT_EN_TIMEZONE=${BOT_EN_TIMEZONE:-UTC}
       - RATE_LIMIT_TZ=${RATE_LIMIT_TZ:-Europe/Berlin}
