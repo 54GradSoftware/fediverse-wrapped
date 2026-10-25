@@ -1,0 +1,8 @@
+minimumReleaseAgeExclude:
+  - '@fedify/fedify@2.3.15'
+  - '@fedify/sqlite@2.3.15'
+  - '@fedify/uri-template@2.3.15'
+  - '@fedify/vocab-runtime@2.3.15'
+  - '@fedify/vocab-tools@2.3.15'
+  - '@fedify/vocab@2.3.15'
+  - '@fedify/webfinger@2.3.15'

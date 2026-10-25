@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "es2023",
+    // esnext.temporal: Temporal is built into Node 26 (stats.ts, db.ts).
+    "lib": ["es2024", "esnext.temporal"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "allowImportingTsExtensions": true,
+    // Node runs these .ts files directly by STRIPPING types. It does not
+    // transform them, so enums, namespaces, parameter properties and
+    // decorators would compile to nothing and fail at runtime.
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noEmit": true,
+    // Load-bearing: BotKit's and Fedify's .d.ts reference an esnext.temporal
+    // lib that TypeScript 5.9 does not ship. See CONTRIBUTING.md.
+    "skipLibCheck": true,
+    "types": ["node"]
+  },
+  "include": ["src", "test", "scripts", "database"]
+}

@@ -1,0 +1,6 @@
+#!/usr/bin/env node
+// Operator commands (`node ace follow @user@host`); see src/cli.ts and README › Development.
+// Plain ESM so Node runs it without a build step.
+import { main } from "./src/cli.ts";
+
+process.exitCode = await main(process.argv.slice(2));

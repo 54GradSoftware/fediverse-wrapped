@@ -1,0 +1,127 @@
+{
+  "botName": "Fediverse Wrapped",
+  "botNameBeta": "Fediverse Wrapped (geschlossene Beta)",
+  "botSummary": "Erwähne diesen Bot und du bekommst dein persönliches Fediverse Wrapped: dein Jahr in teilbaren Bildern, erstellt aus deinen öffentlichen Beiträgen.\n\nDer Bot antwortet genauso öffentlich oder privat, wie du ihn erwähnst. Er liest nur, was im Fediverse ohnehin öffentlich ist, also nie Beiträge nur für Follower und nie DMs. Einmal pro Konto und Tag, und immer nur für das Konto, das ihn erwähnt hat.\n\nIn English: {siblingHandle}\n\nFragen oder Probleme? {contact}\n\nAlle unsere Fediverse-Tools und -Projekte findest du gesammelt auf {fedwerk}.",
+  "propLanguage": "Sprache",
+  "propLanguageValue": "Deutsch",
+  "propAlsoIn": "Auch auf",
+  "propSource": "Quellcode",
+  "propOperator": "Betrieben von",
+  "propPrivacy": "Datenschutz",
+  "propImprint": "Impressum",
+  "pageProjectOf": "ist ein Projekt der",
+  "pageQuestions": "Fragen oder Probleme?",
+  "pageMailAt": "ät",
+  "pageMailDot": "punkt",
+  "ackQueued": "{u} danke! 🎁 Gerade ist viel los, du stehst in der Warteschlange. Dein Wrapped kommt, sobald der Bot durch ist.",
+  "success": "{u} hier ist dein Fediverse Wrapped 🎁\n\n365 Tage, alles aus deinen öffentlichen Beiträgen. Zeiten in {timeZone}.\n\nWelche Kachel überrascht dich?\n\n{tail}",
+  "successStarter": "{u} hier ist dein Fediverse Wrapped 🎁\n\nFür eine große Auswertung war noch nicht genug da, deshalb erstmal eine Kachel. Komm in ein paar Monaten wieder!\n\n{tail}",
+  "dailyLimitOk": "{u} dein Wrapped von heute gibt es schon 🎁 {previous}\n\nEinmal am Tag reicht. Komm morgen wieder für ein frisches. ✨",
+  "dailyLimitRetry": "{u} der Bot hat es heute schon einmal für dich versucht, aber es hat leider nicht geklappt. Komm morgen wieder, dann probiert er es noch mal. ✨",
+  "dailyLimitPending": "{u} dein Wrapped ist schon in Arbeit und kommt, sobald der Bot durch ist. 🎁",
+  "noPostsEver": "{u} der Bot hat noch keine öffentlichen Beiträge von dir gefunden. Poste etwas Öffentliches und komm wieder, dann wartet dein Wrapped auf dich!",
+  "noPostsInWindow": "{u} du hast öffentliche Beiträge, aber keine aus den letzten 12 Monaten. Dein Wrapped wäre sehr ruhig! Poste etwas und erwähne den Bot noch mal.",
+  "outboxForbidden": "{u} der Bot darf deine Beiträge nicht lesen. Dein Server gibt sie nur an Server heraus, die er schon kennt, oder er teilt Outboxes gar nicht. Du hast nichts falsch gemacht!",
+  "outboxNotPublished": "{u} dein Server läuft mit {software}, und {software} gibt Beiträge nicht über die ActivityPub-Outbox heraus, die der Bot liest. Es gibt also nichts zum Auswerten, egal wie viel du postest. Du hast nichts falsch gemacht!",
+  "outboxGone": "{u} der Bot findet deine Beiträge unter dieser Adresse nicht mehr. Falls du kürzlich umgezogen bist, versuch es von deinem neuen Konto aus!",
+  "outboxUnreadable": "{u} dein Server hat geantwortet, aber nicht so, dass der Bot es lesen konnte. Meist ist das nur ein Schluckauf, probier es später noch mal!",
+  "outboxUnavailable": "{u} der Bot kommt an deine öffentlichen Beiträge nicht heran. Das liegt nicht an dir. Probier es später noch mal!",
+  "rateLimited": "{u} dein Server bittet den Bot gerade, langsamer zu machen. Erwähne ihn in etwa einer Stunde noch mal!",
+  "hostUnavailable": "{u} der Bot erreicht deinen Server gerade nicht. Probier es später noch mal!",
+  "internalError": "{u} da ist beim Bot etwas schiefgelaufen, nicht bei dir. Probier es morgen noch einmal; wenn es weiter hakt, schreib an {contact}.",
+  "shareTail": "Teilen ausdrücklich erwünscht. {tag}",
+  "dmTail": "Wenn du eine Version zum Teilen möchtest: erwähne den Bot einfach öffentlich.",
+  "secondPost": "{u} …und hier Teil zwei 📸\n\n{tail}",
+  "partialLine": "Dein Jahr war zu groß für den Bot 😅 Zahlen sind Mindestwerte.",
+  "engagementLine": "Dein Server veröffentlicht keine Favoriten- und Boost-Zahlen über ActivityPub, deshalb fehlen diese Statistiken.",
+  "tzHintLine": "Andere Zeitzone? Schreib beim nächsten Mal tz=Europe/Vienna dazu.",
+  "tileNumbers": "📊 Dein Jahr in Zahlen",
+  "tileRhythm": "⏰ Dein Rhythmus",
+  "tileTopics": "🏷️ Deine Themen",
+  "tileType": "🎭 Dein Fedi-Typ",
+  "tileWords": "✍️ Deine Wörter",
+  "tileResonance": "⭐ Deine Resonanz",
+  "tileMedia": "🖼️ Deine Medien",
+  "tileCommunity": "👥 Deine Community",
+  "tileStarter": "🌱 Deine ersten Schritte",
+  "labelPosts": "📝 öffentliche Beiträge",
+  "labelBoosts": "♻️ Boosts",
+  "labelReplies": "💬 Antworten",
+  "labelWithMedia": "🖼️ mit Medien",
+  "labelWithAlt": "♿ davon mit Alt-Text",
+  "labelAltRate": "📈 Alt-Text-Quote",
+  "labelWithCw": "⚠️ mit Inhaltswarnung",
+  "labelLikesReceived": "⭐ Favoriten erhalten",
+  "labelBoostsReceived": "♻️ Boosts erhalten",
+  "labelAvgLikes": "⭐ Favoriten pro Beitrag",
+  "labelAvgBoosts": "♻️ Boosts pro Beitrag",
+  "labelBusiestWeekday": "📆 aktivster Tag",
+  "labelBusiestHour": "🕐 aktivste Stunde",
+  "labelBusiestMonth": "📅 aktivster Monat",
+  "labelStreak": "🔥 längste Serie",
+  "labelActiveDays": "✅ aktive Tage von 365",
+  "labelCharacters": "🔤 Zeichen",
+  "labelWords": "✍️ Wörter geschrieben",
+  "labelBookPages": "📖 Buchseiten",
+  "labelAvgWords": "📊 Wörter pro Beitrag",
+  "labelLongestPost": "📏 längster Beitrag",
+  "labelDistinctHashtags": "🏷️ verschiedene Hashtags",
+  "labelFollowers": "👥 Follower",
+  "labelAccountSince": "📅 auf diesem Server seit",
+  "labelMentioned": "👤 Konten erwähnt",
+  "labelFavouriteTag": "🥇 Lieblings-Hashtag",
+  "hourValue": "{n} Uhr",
+  "dayValue": "{n, plural, one {# Tag} other {# Tage}}",
+  "pagesValue": "{n, plural, one {# Seite} other {# Seiten}}",
+  "timesIn": "Zeiten in {timeZone}",
+  "starterLine": "Ein Anfang ist gemacht 🌱",
+  "footerTitle": "Fediverse Wrapped {year}",
+  "dateRange": "{from} bis {to}",
+  "archetype": {
+    "altTextHero": {
+      "name": "Alt-Text-Held*in",
+      "line": "Fast jedes Bild beschrieben. Danke dafür."
+    },
+    "marathoner": {
+      "name": "Dauerläufer*in",
+      "line": "Tag für Tag für Tag."
+    },
+    "nightOwl": {
+      "name": "Nachteule",
+      "line": "Die besten Gedanken kommen spät."
+    },
+    "earlyBird": {
+      "name": "Frühaufsteher*in",
+      "line": "Gepostet, bevor der Kaffee da ist."
+    },
+    "weekendVoice": {
+      "name": "Wochenendstimme",
+      "line": "Samstag und Sonntag gehören dir."
+    },
+    "conversationalist": {
+      "name": "Gesprächsmensch",
+      "line": "Vor allem hier, um zu reden."
+    },
+    "pictureMaker": {
+      "name": "Bildermensch",
+      "line": "Du denkst in Bildern."
+    },
+    "hashtagGardener": {
+      "name": "Hashtag-Gärtner*in",
+      "line": "Du hältst die Tags am Leben."
+    },
+    "regular": {
+      "name": "Stammgast",
+      "line": "Ruhig, beständig, immer da."
+    }
+  },
+  "funFact": {
+    "bookPages": "Das sind ungefähr {n, number} Buchseiten.",
+    "activeDays": "An {n, number} Tagen warst du da.",
+    "altTextRate": "{n, number}% deiner Bilder hatten Alt-Text.",
+    "boostedMore": "Du wurdest {n, number}-mal geboostet, öfter als favorisiert.",
+    "longPost": "Dein längster Beitrag hatte {n, number} Zeichen.",
+    "everyOtherDay": "{n, number} aktive Tage, öfter als jeden zweiten Tag."
+  },
+  "altIntro": "Fediverse Wrapped, {tile}, {handle}:"
+}

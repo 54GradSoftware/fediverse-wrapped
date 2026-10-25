@@ -1,0 +1,42 @@
+# Coolify: SERVICE_FQDN_WRAPPED_8000 generates the domain and routes to port 8000;
+# SERVICE_BASE64_SALT is a generated 32-char secret. Both bots share this one container.
+services:
+  wrapped:
+    build: .
+    restart: unless-stopped
+    # No drain on shutdown; boot recovery re-queues interrupted jobs.
+    stop_grace_period: 20s
+    # Bounds the worst case of an enormous remote document.
+    mem_limit: 768m
+    environment:
+      - SERVICE_FQDN_WRAPPED_8000
+      # IMMUTABLE after the first federation. See the warning box in README.md.
+      - ORIGIN=https://${SERVICE_FQDN_WRAPPED}
+      - BOT_DE_ID=${BOT_DE_ID:-fediwrapped_de}
+      - BOT_EN_ID=${BOT_EN_ID:-fediwrapped_en}
+      # Changeable at any time.
+      - BOT_DE_USERNAME=${BOT_DE_USERNAME:-}
+      - BOT_EN_USERNAME=${BOT_EN_USERNAME:-}
+      - DATA_DIR=/data
+      - ACTOR_SALT=${SERVICE_BASE64_SALT}
+      - BOT_DE_TIMEZONE=${BOT_DE_TIMEZONE:-Europe/Berlin}
+      - BOT_EN_TIMEZONE=${BOT_EN_TIMEZONE:-UTC}
+      - RATE_LIMIT_TZ=${RATE_LIMIT_TZ:-Europe/Berlin}
+      - WORKERS=${WORKERS:-2}
+      - INBOX_CONCURRENCY=${INBOX_CONCURRENCY:-2}
+      - DELIVERY_CONCURRENCY=${DELIVERY_CONCURRENCY:-8}
+      - IMAGE_RETENTION_DAYS=${IMAGE_RETENTION_DAYS:-180}
+      - JOB_RETENTION_DAYS=${JOB_RETENTION_DAYS:-30}
+      - LEDGER_RETENTION_DAYS=${LEDGER_RETENTION_DAYS:-60}
+      - IMPRINT_URL=${IMPRINT_URL:-}
+      - SOURCE_URL=${SOURCE_URL:-https://github.com/54GradSoftware/fediverse-wrapped}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - FEDIFY_LOG_LEVEL=${FEDIFY_LOG_LEVEL:-warning}
+      - LOG_FORMAT=${LOG_FORMAT:-json}
+    volumes:
+      # NAMED volume and directory only: SQLite WAL needs real POSIX locks, which
+      # network or FUSE mounts lack, corrupting the database. Never delete it.
+      - wrapped-data:/data
+
+volumes:
+  wrapped-data:

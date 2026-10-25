@@ -1,0 +1,11 @@
+# Allow-list: everything is excluded, then the runtime inputs are added back.
+*
+!package.json
+!package-lock.json
+!src
+!fonts
+!locales
+!database
+!static
+!templates
+!ace

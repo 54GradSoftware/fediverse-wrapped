@@ -1,0 +1,15 @@
+version: 2
+updates:
+  # Review by hand: @fedify/botkit is pinned for an undeclared publish option the worker
+  # uses, and the Fedify minor must match BotKit's.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      fedify:
+        patterns: ["@fedify/*"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

@@ -1,0 +1,72 @@
+body.bk-page {
+  display: flex;
+  flex-direction: column;
+}
+.bk-container {
+  flex: 1 0 auto;
+}
+.fw-footer {
+  margin: var(--bk-space-7) calc(-1 * var(--bk-space-4)) calc(-1 * var(--bk-space-7));
+  color: #2c3e50;
+  font-family: Roboto, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.8;
+}
+.fw-footer a {
+  color: #0f5d8a;
+}
+.fw-footer a:focus-visible {
+  outline: 3px solid #2c3e50;
+  outline-offset: 2px;
+}
+.fw-wrap {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+.fw-info {
+  background: #f1f1f1;
+  padding: 2rem 0;
+  font-size: 0.9rem;
+}
+.fw-info-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem;
+}
+.fw-info-inner p {
+  margin: 0;
+}
+.fw-logo {
+  display: block;
+  line-height: 0;
+}
+.fw-law {
+  background: #0f5d8a;
+  color: #fff;
+  padding: 1.5rem 0;
+  font-weight: 700;
+}
+.fw-law-inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.fw-footer .fw-law a {
+  color: #fff;
+}
+.fw-footer .fw-law a:focus-visible {
+  outline-color: #fff;
+}
+.fw-nowrap {
+  white-space: nowrap;
+}
+@media (max-width: 34rem) {
+  .fw-footer {
+    margin: var(--bk-space-6) calc(-1 * var(--bk-space-3)) calc(-1 * var(--bk-space-6));
+  }
+  .fw-wrap {
+    padding: 0 1rem;
+  }
+}

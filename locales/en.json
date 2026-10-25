@@ -1,0 +1,127 @@
+{
+  "botName": "Fediverse Wrapped",
+  "botNameBeta": "Fediverse Wrapped (Closed Beta)",
+  "botSummary": "Mention this bot and you get your personal Fediverse Wrapped: your year in shareable images, built from your public posts.\n\nThe bot answers exactly as publicly or as privately as you mention it. It only reads what is already public in the fediverse: never followers-only posts, never DMs. Once per account per day, and only ever for the account that mentioned it.\n\nAuf Deutsch: {siblingHandle}\n\nQuestions or problems? {contact}\n\nYou'll find all our fediverse tools and projects in one place on {fedwerk}.",
+  "propLanguage": "Language",
+  "propLanguageValue": "English",
+  "propAlsoIn": "Also in",
+  "propSource": "Source",
+  "propOperator": "Run by",
+  "propPrivacy": "Privacy",
+  "propImprint": "Imprint",
+  "pageProjectOf": "is a project of",
+  "pageQuestions": "Questions or problems?",
+  "pageMailAt": "at",
+  "pageMailDot": "dot",
+  "ackQueued": "{u} thank you! 🎁 It's busy right now, so you're in the queue. Your Wrapped is on its way.",
+  "success": "{u} here's your Fediverse Wrapped 🎁\n\n365 days, all from your public posts. Times in {timeZone}.\n\nWhich tile surprised you?\n\n{tail}",
+  "successStarter": "{u} here's your Fediverse Wrapped 🎁\n\nThere wasn't quite enough yet for the full set, so here's one tile to start with. Come back in a few months!\n\n{tail}",
+  "dailyLimitOk": "{u} you already got today's Wrapped 🎁 {previous}\n\nOnce a day is plenty. Come back tomorrow for a fresh one. ✨",
+  "dailyLimitRetry": "{u} the bot already tried for you today and it didn't work out. Come back tomorrow and it will give it another go. ✨",
+  "dailyLimitPending": "{u} your Wrapped is already in the works and coming as soon as the bot is done. 🎁",
+  "noPostsEver": "{u} the bot couldn't find any public posts from you yet. Post something public and come back, your Wrapped will be waiting!",
+  "noPostsInWindow": "{u} you have public posts, but none from the last 12 months. Your Wrapped would be a very quiet one! Post something and mention the bot again.",
+  "outboxForbidden": "{u} the bot isn't allowed to read your posts. Your server only hands them to servers it already knows, or it doesn't share outboxes at all. Nothing you did wrong!",
+  "outboxNotPublished": "{u} your server runs {software}, and {software} doesn't publish posts in the ActivityPub outbox the bot reads, so there's nothing to wrap, however much you post. Nothing you did wrong!",
+  "outboxGone": "{u} the bot can't find your posts at that address any more. If you moved accounts recently, try again from your new one!",
+  "outboxUnreadable": "{u} your server answered, but not in a way the bot could read. That's usually a hiccup, so try again later!",
+  "outboxUnavailable": "{u} the bot can't get to your public posts. That's not on you. Try again later!",
+  "rateLimited": "{u} your server is asking the bot to slow down right now. Mention the bot again in about an hour!",
+  "hostUnavailable": "{u} the bot can't reach your server at the moment. Try again later!",
+  "internalError": "{u} something broke on the bot's side, not yours. Try again tomorrow, and if it keeps failing, write to {contact}.",
+  "shareTail": "Sharing very much encouraged. {tag}",
+  "dmTail": "Want a version you can boost? Just mention the bot publicly.",
+  "secondPost": "{u} …and part two 📸\n\n{tail}",
+  "partialLine": "Your year was too big for the bot 😅 Numbers are a lower bound.",
+  "engagementLine": "Your server doesn't publish favourite and boost counts over ActivityPub, so those stats aren't here.",
+  "tzHintLine": "Different timezone? Add tz=America/New_York next time.",
+  "tileNumbers": "📊 Your year in numbers",
+  "tileRhythm": "⏰ Your rhythm",
+  "tileTopics": "🏷️ Your topics",
+  "tileType": "🎭 Your fedi type",
+  "tileWords": "✍️ Your words",
+  "tileResonance": "⭐ Your resonance",
+  "tileMedia": "🖼️ Your media",
+  "tileCommunity": "👥 Your community",
+  "tileStarter": "🌱 Your first steps",
+  "labelPosts": "📝 public posts",
+  "labelBoosts": "♻️ boosts",
+  "labelReplies": "💬 replies",
+  "labelWithMedia": "🖼️ with media",
+  "labelWithAlt": "♿ of those with alt text",
+  "labelAltRate": "📈 alt text rate",
+  "labelWithCw": "⚠️ with content warning",
+  "labelLikesReceived": "⭐ favourites received",
+  "labelBoostsReceived": "♻️ boosts received",
+  "labelAvgLikes": "⭐ favourites per post",
+  "labelAvgBoosts": "♻️ boosts per post",
+  "labelBusiestWeekday": "📆 busiest day",
+  "labelBusiestHour": "🕐 busiest hour",
+  "labelBusiestMonth": "📅 busiest month",
+  "labelStreak": "🔥 longest streak",
+  "labelActiveDays": "✅ active days of 365",
+  "labelCharacters": "🔤 characters",
+  "labelWords": "✍️ words written",
+  "labelBookPages": "📖 book pages",
+  "labelAvgWords": "📊 words per post",
+  "labelLongestPost": "📏 longest post",
+  "labelDistinctHashtags": "🏷️ different hashtags",
+  "labelFollowers": "👥 followers",
+  "labelAccountSince": "📅 on this server since",
+  "labelMentioned": "👤 accounts mentioned",
+  "labelFavouriteTag": "🥇 favourite hashtag",
+  "hourValue": "{n}:00",
+  "dayValue": "{n, plural, one {# day} other {# days}}",
+  "pagesValue": "{n, plural, one {# page} other {# pages}}",
+  "timesIn": "Times in {timeZone}",
+  "starterLine": "Every account starts somewhere 🌱",
+  "footerTitle": "Fediverse Wrapped {year}",
+  "dateRange": "{from} to {to}",
+  "archetype": {
+    "altTextHero": {
+      "name": "Alt Text Hero",
+      "line": "Almost every image described. Thank you."
+    },
+    "marathoner": {
+      "name": "The Marathoner",
+      "line": "Day after day after day."
+    },
+    "nightOwl": {
+      "name": "Night Owl",
+      "line": "The best thoughts arrive late."
+    },
+    "earlyBird": {
+      "name": "Early Bird",
+      "line": "Posting before the coffee lands."
+    },
+    "weekendVoice": {
+      "name": "Weekend Voice",
+      "line": "Saturdays and Sundays are yours."
+    },
+    "conversationalist": {
+      "name": "The Conversationalist",
+      "line": "Mostly here to talk with people."
+    },
+    "pictureMaker": {
+      "name": "The Picture Maker",
+      "line": "You think in images."
+    },
+    "hashtagGardener": {
+      "name": "Hashtag Gardener",
+      "line": "You keep the tags alive."
+    },
+    "regular": {
+      "name": "The Regular",
+      "line": "Steady, reliable, always around."
+    }
+  },
+  "funFact": {
+    "bookPages": "That's about {n, number} book pages.",
+    "activeDays": "You showed up on {n, number} days.",
+    "altTextRate": "{n, number}% of your images had alt text.",
+    "boostedMore": "You were boosted {n, number} times, more than you were favourited.",
+    "longPost": "Your longest post ran to {n, number} characters.",
+    "everyOtherDay": "{n, number} active days, better than every other day."
+  },
+  "altIntro": "Fediverse Wrapped, {tile}, {handle}:"
+}

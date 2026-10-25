@@ -1,0 +1,21 @@
+<footer class="fw-footer" lang="{{locale}}">
+  <div class="fw-info"><div class="fw-wrap fw-info-inner">
+    <a class="fw-logo" href="{{home}}"><img src="{{logoPath}}" alt="FedWerk" width="88" height="32"></a>
+    <p>
+      <a href="{{home}}">FedWerk</a> {{projectOf}} <a href="https://54gradsoftware.de/">54&nbsp;Grad Software GmbH</a><br>
+      Plankemai 1 · 24937 Flensburg<br>
+      <!-- biome-ignore lint/a11y/useValidAnchor: the script below sets the href, so scrapers never see the address -->
+      <a data-mail-user="kontakt" data-mail-domain="54gradsoftware.de">kontakt <span class="fw-nowrap"><span aria-hidden="true">[</span>{{mailAt}}<span aria-hidden="true">]</span> 54gradsoftware</span> <span class="fw-nowrap"><span aria-hidden="true">[</span>{{mailDot}}<span aria-hidden="true">]</span> de</span></a> · <a href="{{operatorUrl}}">{{operatorHandle}}</a><br>
+      {{questions}} <a href="{{questionsUrl}}">{{questionsHandle}}</a>
+    </p>
+  </div></div>
+  <div class="fw-law"><div class="fw-wrap fw-law-inner">
+    <span><a href="{{imprintUrl}}">{{imprint}}</a> · <a href="/privacy">{{privacy}}</a></span>
+    <span>{{{languages}}}</span>
+  </div></div>
+</footer>
+<script>
+  document.querySelectorAll('a[data-mail-user]').forEach((link)=>{
+    link.href='mailto:'+link.getAttribute('data-mail-user')+'@'+link.getAttribute('data-mail-domain');
+  });
+</script>
