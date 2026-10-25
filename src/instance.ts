@@ -4,6 +4,7 @@ import type { DatabaseSync } from "node:sqlite";
 import type { Bot, Text } from "@fedify/botkit";
 import {
   createInstance,
+  hashtag,
   link,
   ParallelMessageQueue,
   plainText,
@@ -23,7 +24,7 @@ import {
   QUESTIONS_HANDLE,
   QUESTIONS_URL,
 } from "./footer.ts";
-import { catalogueFor } from "./strings.ts";
+import { CAMPAIGN_TAG, catalogueFor } from "./strings.ts";
 
 // Hides enqueueMany(): in @fedify/sqlite (2.3 to 2.4.4) it nests transactions and throws.
 // `consume: false` stops the CLI's queue workers from stealing the running bot's mentions.
@@ -101,6 +102,7 @@ export function buildInstance(db: DatabaseSync, { consumeQueues = true } = {}) {
           siblingHandle,
           link(QUESTIONS_HANDLE, QUESTIONS_URL),
           link("FedWerk", fedwerkUrl(config.locale)),
+          hashtag(CAMPAIGN_TAG),
         ),
         icon: avatar(),
         // The bot never follows back; see the assertion in main.ts.

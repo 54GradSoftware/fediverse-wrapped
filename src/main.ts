@@ -74,7 +74,7 @@ for (const { config } of bots) {
 
 if (cfg.testingMode) {
   logger.warn(
-    "TESTING MODE (closed beta): the bots answer only direct messages from accounts they follow; add one with `node ace follow @user@host`",
+    "TESTING MODE (closed beta): the bots answer only direct messages from accounts on the test list; add one with `node ace follow @user@host`",
   );
 }
 

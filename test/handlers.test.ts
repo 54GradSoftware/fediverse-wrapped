@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import type { text } from "@fedify/botkit";
+import type { Db } from "../src/db.ts";
 import { testDb } from "./helpers.ts";
 
 // TESTING_MODE is set before config.ts is imported; env.ts fills in the rest.
@@ -36,13 +37,15 @@ const BOT = first(cfg.bots);
 const botActor = new URL(`/ap/actor/${BOT.handle}`, cfg.origin);
 
 /** A mention from a stranger's server, with the calls the handler makes recorded. */
-function mention(
-  follows: boolean,
+async function mention(
+  db: Db,
+  listed: boolean,
   id = "https://remote.test/notes/1",
   actor = "https://remote.test/users/alice",
   // Testing mode answers direct messages only.
   visibility = "direct",
 ) {
+  if (listed) await db.addTestAccount(BOT.handle, actor, "alice@remote.test", Date.now());
   const calls: string[] = [];
   const replies: unknown[] = [];
   const session = {
@@ -51,7 +54,7 @@ function mention(
     context: { getActorUri: (id: string) => new URL(`/ap/actor/${id}`, cfg.origin) },
     follows: async () => {
       calls.push("follows");
-      return follows;
+      return false;
     },
   } as unknown as Session;
   const message = {
@@ -78,19 +81,20 @@ describe("testing mode", () => {
     assert.equal(cfg.testingMode, true);
   });
 
-  it("drops a mention from an account the bot does not follow, without any reaction", async () => {
+  it("drops a mention from an account not on the test list, without any reaction", async () => {
     const db = await testDb();
-    const { session, message, calls } = mention(false);
+    const { session, message, calls } = await mention(db, false);
     await makeMentionHandler(db)(session, message);
-    assert.deepEqual(calls, ["follows"], "no like, no reply, nothing else");
+    assert.deepEqual(calls, [], "no like, no reply, nothing else");
     assert.equal(await db.jobsAhead(Date.now()), 0, "no job was queued");
   });
 
-  it("drops a public mention even from an account the bot follows", async () => {
+  it("drops a public mention even from an account on the test list", async () => {
     // Nothing the bot posts during the beta may be public.
     const db = await testDb();
     for (const visibility of ["public", "unlisted", "followers"]) {
-      const { session, message, calls } = mention(
+      const { session, message, calls } = await mention(
+        db,
         true,
         `https://remote.test/notes/${visibility}`,
         "https://remote.test/users/alice",
@@ -108,9 +112,9 @@ describe("testing mode", () => {
     }
   });
 
-  it("serves a direct message from an account the bot follows as in normal operation", async () => {
+  it("serves a direct message from a listed account whose follow is still pending", async () => {
     const db = await testDb();
-    const { session, message, calls } = mention(true);
+    const { session, message, calls } = await mention(db, true);
     await makeMentionHandler(db)(session, message);
     assert.ok(calls.includes("like"), "the mention was favourited");
     assert.equal(await db.jobsAhead(Date.now()), 1, "one job was queued");
@@ -121,10 +125,10 @@ describe("a second mention on the same day", () => {
   it("says the wrapped is on its way while the first one is still queued", async () => {
     const db = await testDb();
     const handler = makeMentionHandler(db);
-    const first = mention(true);
+    const first = await mention(db, true);
     await handler(first.session, first.message);
 
-    const again = mention(true, "https://remote.test/notes/2");
+    const again = await mention(db, true, "https://remote.test/notes/2");
     await handler(again.session, again.message);
     assert.equal(again.replies.length, 1);
     const reply = await html(again.replies[0]);
@@ -135,13 +139,13 @@ describe("a second mention on the same day", () => {
   it("says it did not work out once the first one has failed", async () => {
     const db = await testDb();
     const handler = makeMentionHandler(db);
-    const first = mention(true);
+    const first = await mention(db, true);
     await handler(first.session, first.message);
     const hash = db.hashActor("https://remote.test/users/alice");
     await db.finishJob("https://remote.test/notes/1", "failed", "outboxGone", Date.now());
     await db.setReplyOutcome(hash, dayKey(new Date(), cfg.rateLimitTimeZone), "outboxGone");
 
-    const again = mention(true, "https://remote.test/notes/2");
+    const again = await mention(db, true, "https://remote.test/notes/2");
     await handler(again.session, again.message);
     assert.match(await html(again.replies[0]), /nicht geklappt/);
   });
@@ -154,10 +158,20 @@ describe("host trigger budget", () => {
     // Fedify retries a delivery up to ten times; several retried mentions must
     // not lock out the next genuine one from the same server.
     for (let index = 0; index < 40; index++) {
-      const again = mention(true, "https://budget.test/notes/1", "https://budget.test/users/a");
+      const again = await mention(
+        db,
+        true,
+        "https://budget.test/notes/1",
+        "https://budget.test/users/a",
+      );
       await handler(again.session, again.message);
     }
-    const other = mention(true, "https://budget.test/notes/2", "https://budget.test/users/b");
+    const other = await mention(
+      db,
+      true,
+      "https://budget.test/notes/2",
+      "https://budget.test/users/b",
+    );
     await handler(other.session, other.message);
     assert.ok(
       await db.hasJob("https://budget.test/notes/2"),

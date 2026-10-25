@@ -96,8 +96,9 @@ async function handleMention(
   // replying inside somebody else's thread is a normal way to summon the bot.
   if (message.replyTarget?.actor?.id?.href === session.actorId.href) return;
 
-  // Testing mode: only a DM from an account the bot follows (set up by the operator with
-  // `node ace follow`) gets any reaction; everything else is dropped silently.
+  // Testing mode: only a DM from an account on the test list (added by the operator with
+  // `node ace follow`) gets any reaction; everything else is dropped silently. The list,
+  // not session.follows(), so a tester need not accept the follow request first.
   if (cfg.testingMode && message.visibility !== "direct") {
     logger.info("testing mode: ignored a {visibility} mention from {hash}", {
       visibility: message.visibility,
@@ -105,7 +106,7 @@ async function handleMention(
     });
     return;
   }
-  if (cfg.testingMode && !(await session.follows(message.actor))) {
+  if (cfg.testingMode && !(await db.isTestAccount(session.bot.identifier, actorId.href))) {
     logger.info("testing mode: ignored a mention from {hash}", {
       hash: db.hashActor(actorId.href).slice(0, 12),
     });

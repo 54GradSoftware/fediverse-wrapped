@@ -1,7 +1,7 @@
 {
   "botName": "⁂ Fediverse Wrapped DE",
   "botNameBeta": "⁂ Fediverse Wrapped DE (geschlossene Beta)",
-  "botSummary": "Erwähne diesen Bot und du bekommst dein persönliches Fediverse Wrapped: dein Jahr in teilbaren Bildern, erstellt aus deinen öffentlichen Beiträgen.\n\nDer Bot antwortet genauso öffentlich oder privat, wie du ihn erwähnst. Er liest nur, was im Fediverse ohnehin öffentlich ist, also nie Beiträge nur für Follower und nie DMs. Einmal pro Konto und Tag, und immer nur für das Konto, das ihn erwähnt hat.\n\nIn English: {siblingHandle}\n\nFragen oder Probleme? {contact}\n\nAlle unsere Fediverse-Tools und -Projekte findest du gesammelt auf {fedwerk}.",
+  "botSummary": "Erwähne diesen Bot und du bekommst dein persönliches Fediverse Wrapped: dein Jahr in teilbaren Bildern, erstellt aus deinen öffentlichen Beiträgen.\n\nWenn du deine Bilder teilst, nutze gern {tag}, damit andere sie finden.\n\nDer Bot antwortet genauso öffentlich oder privat, wie du ihn erwähnst. Er liest nur, was im Fediverse ohnehin öffentlich ist, also nie Beiträge nur für Follower und nie DMs. Einmal pro Konto und Tag, und immer nur für das Konto, das ihn erwähnt hat.\n\nIn English: {siblingHandle}\n\nFragen oder Probleme? {contact}\n\nAlle unsere Fediverse-Tools und -Projekte findest du gesammelt auf {fedwerk}.",
   "propLanguage": "Sprache",
   "propLanguageValue": "Deutsch",
   "propAlsoIn": "Auch auf",
@@ -29,7 +29,7 @@
   "rateLimited": "{u} dein Server bittet den Bot gerade, langsamer zu machen. Erwähne ihn in etwa einer Stunde noch mal!",
   "hostUnavailable": "{u} der Bot erreicht deinen Server gerade nicht. Probier es später noch mal!",
   "internalError": "{u} da ist beim Bot etwas schiefgelaufen, nicht bei dir. Probier es morgen noch einmal; wenn es weiter hakt, schreib an {contact}.",
-  "shareTail": "Teilen ausdrücklich erwünscht. {tag}",
+  "shareTail": "Teilen ausdrücklich erwünscht! Wenn du die Bilder selbst teilst, nutze gern {tag}, damit andere sie finden.",
   "dmTail": "Wenn du eine Version zum Teilen möchtest: erwähne den Bot einfach öffentlich.",
   "secondPost": "{u} …und hier Teil zwei 📸\n\n{tail}",
   "partialLine": "Dein Jahr war zu groß für den Bot 😅 Zahlen sind Mindestwerte.",

@@ -67,8 +67,8 @@ class Follow extends AccountCommand {
   static override commandName = "follow";
   static override description = "Follow an account from the bots (testing mode only)";
   static override help = [
-    "With TESTING_MODE=true the bots answer only direct messages from accounts they follow.",
-    "The follow counts once the other server accepts it; `node ace following` shows the state.",
+    "With TESTING_MODE=true the bots answer only direct messages from accounts on the test list.",
+    "The account counts right away, even while the follow request is still pending.",
   ];
 
   override async run(): Promise<void> {
@@ -87,7 +87,7 @@ class Follow extends AccountCommand {
         await binding.bot.getSession(cfg.origin).follow(actor);
         await db.addTestAccount(binding.config.handle, actor.id.href, handle, Date.now());
         this.logger.success(
-          `${binding.config.handle}: Follow sent to ${handle} — counts once accepted (node ace following)`,
+          `${binding.config.handle}: ${handle} added to the test list, Follow sent`,
         );
       }
     } finally {

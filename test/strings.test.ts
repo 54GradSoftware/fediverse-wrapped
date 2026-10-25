@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { text } from "@fedify/botkit";
+import { hashtag, link, text } from "@fedify/botkit";
 import { type Actor, Person } from "@fedify/vocab";
 import { ARCHETYPE_IDS, FUN_FACT_IDS } from "../src/stats.ts";
 import {
   assertSameKeys,
   buildCatalogue,
+  CAMPAIGN_TAG,
   catalogues,
   loadLocale,
   type RawLocale,
@@ -104,6 +105,18 @@ ${tail}`);
     const rendered = await html(catalogues.de.shareTail());
     assert.match(rendered, /class="mention hashtag"/);
     assert.match(rendered, /#<span>FediverseWrapped<\/span>/);
+  });
+
+  it("put the campaign hashtag in the profile as a real tag", async () => {
+    for (const locale of ["de", "en"] as const) {
+      const summary = catalogues[locale].botSummary(
+        "@sibling@example.com",
+        link("contact", "https://example.test/contact"),
+        link("FedWerk", "https://example.test/fedwerk"),
+        hashtag(CAMPAIGN_TAG),
+      );
+      assert.match(await html(summary), /#<span>FediverseWrapped<\/span>/, locale);
+    }
   });
 
   it("choose the plural form and the number format per language", () => {

@@ -44,7 +44,7 @@ npm test && npm run typecheck && npm run lint
 ```
 
 `TESTING_MODE=true` runs a closed beta: the bot only answers DMs from accounts
-the operator followed with `node ace follow @user@host`.
+the operator added with `node ace follow @user@host`, accepted or still pending.
 
 ## Deployment
 

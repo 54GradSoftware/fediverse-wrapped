@@ -13,14 +13,19 @@ import { ARCHETYPE_IDS, type ArchetypeId, FUN_FACT_IDS, type FunFactId } from ".
 export type Block = Text<"block", void>;
 type Inline = Text<"inline", void>;
 
-/** The campaign hashtag. Public replies only, never on a direct message. */
+/** The campaign hashtag. Public replies and the profile only, never on a direct message. */
 export const CAMPAIGN_TAG = "FediverseWrapped";
 
 export type Catalogue = {
   readonly botName: string;
   /** The display name while TESTING_MODE is on. */
   readonly botNameBeta: string;
-  readonly botSummary: (siblingHandle: string, contact: Inline, fedwerk: Inline) => Block;
+  readonly botSummary: (
+    siblingHandle: string,
+    contact: Inline,
+    fedwerk: Inline,
+    tag: Inline,
+  ) => Block;
   readonly propLanguage: string;
   readonly propLanguageValue: string;
   readonly propAlsoIn: string;
@@ -277,7 +282,7 @@ export function buildCatalogue(locale: Locale, raw: RawLocale): Catalogue {
   const catalogue: Catalogue = {
     botName: str("botName"),
     botNameBeta: str("botNameBeta"),
-    botSummary: block("botSummary", "siblingHandle", "contact", "fedwerk"),
+    botSummary: block("botSummary", "siblingHandle", "contact", "fedwerk", "tag"),
     propLanguage: str("propLanguage"),
     propLanguageValue: str("propLanguageValue"),
     propAlsoIn: str("propAlsoIn"),

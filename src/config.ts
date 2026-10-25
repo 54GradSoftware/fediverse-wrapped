@@ -89,7 +89,7 @@ const rules = Env.rules({
   FEDIFY_LOG_LEVEL: Env.schema.enum.optional(LEVELS),
   LOG_FORMAT: Env.schema.enum.optional(["json", "text"] as const),
 
-  /** README › Testbetrieb: only DMs from accounts the bots follow, as "Closed Beta". */
+  /** README › Testbetrieb: only DMs from accounts on the test list, as "Closed Beta". */
   TESTING_MODE: Env.schema.boolean.optional(),
 });
 

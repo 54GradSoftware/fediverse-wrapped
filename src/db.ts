@@ -430,6 +430,15 @@ export async function openDb(path: string, salt: string) {
       return Number(deleted) > 0;
     },
 
+    async isTestAccount(bot: string, actorId: string): Promise<boolean> {
+      const row = await client
+        .from("test_accounts")
+        .select("actor_id")
+        .where({ bot, actor_id: actorId })
+        .first();
+      return row != null;
+    },
+
     async listTestAccounts(): Promise<TestAccount[]> {
       return (await client
         .from("test_accounts")

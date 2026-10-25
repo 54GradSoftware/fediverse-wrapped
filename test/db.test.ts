@@ -293,7 +293,19 @@ describe("test accounts", () => {
         ["fediwrapped_en", "a@x.test"],
       ],
     );
+    assert.equal(await db.isTestAccount("fediwrapped_de", "https://x.test/users/a"), true);
+    assert.equal(await db.isTestAccount("fediwrapped_de", "https://x.test/users/b"), false);
     assert.equal(await db.removeTestAccount("fediwrapped_de", "https://x.test/users/a"), true);
+    assert.equal(
+      await db.isTestAccount("fediwrapped_de", "https://x.test/users/a"),
+      false,
+      "per bot",
+    );
+    assert.equal(
+      await db.isTestAccount("fediwrapped_en", "https://x.test/users/a"),
+      true,
+      "per bot",
+    );
     assert.equal(await db.removeTestAccount("fediwrapped_de", "https://x.test/users/a"), false);
     assert.equal((await db.listTestAccounts()).length, 1);
   });

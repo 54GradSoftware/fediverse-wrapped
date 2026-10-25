@@ -1,7 +1,7 @@
 {
   "botName": "⁂ Fediverse Wrapped EN",
   "botNameBeta": "⁂ Fediverse Wrapped EN (Closed Beta)",
-  "botSummary": "Mention this bot and you get your personal Fediverse Wrapped: your year in shareable images, built from your public posts.\n\nThe bot answers exactly as publicly or as privately as you mention it. It only reads what is already public in the fediverse: never followers-only posts, never DMs. Once per account per day, and only ever for the account that mentioned it.\n\nAuf Deutsch: {siblingHandle}\n\nQuestions or problems? {contact}\n\nYou'll find all our fediverse tools and projects in one place on {fedwerk}.",
+  "botSummary": "Mention this bot and you get your personal Fediverse Wrapped: your year in shareable images, built from your public posts.\n\nSharing your images? Use {tag} so others can find them.\n\nThe bot answers exactly as publicly or as privately as you mention it. It only reads what is already public in the fediverse: never followers-only posts, never DMs. Once per account per day, and only ever for the account that mentioned it.\n\nAuf Deutsch: {siblingHandle}\n\nQuestions or problems? {contact}\n\nYou'll find all our fediverse tools and projects in one place on {fedwerk}.",
   "propLanguage": "Language",
   "propLanguageValue": "English",
   "propAlsoIn": "Also in",
@@ -29,7 +29,7 @@
   "rateLimited": "{u} your server is asking the bot to slow down right now. Mention the bot again in about an hour!",
   "hostUnavailable": "{u} the bot can't reach your server at the moment. Try again later!",
   "internalError": "{u} something broke on the bot's side, not yours. Try again tomorrow, and if it keeps failing, write to {contact}.",
-  "shareTail": "Sharing very much encouraged. {tag}",
+  "shareTail": "Sharing very much encouraged! If you share the images yourself, use {tag} so others can find them.",
   "dmTail": "Want a version you can boost? Just mention the bot publicly.",
   "secondPost": "{u} …and part two 📸\n\n{tail}",
   "partialLine": "Your year was too big for the bot 😅 Numbers are a lower bound.",
