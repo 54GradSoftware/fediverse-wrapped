@@ -1,6 +1,6 @@
 {
-  "botName": "Fediverse Wrapped",
-  "botNameBeta": "Fediverse Wrapped (geschlossene Beta)",
+  "botName": "⁂ Fediverse Wrapped DE",
+  "botNameBeta": "⁂ Fediverse Wrapped DE (geschlossene Beta)",
   "botSummary": "Erwähne diesen Bot und du bekommst dein persönliches Fediverse Wrapped: dein Jahr in teilbaren Bildern, erstellt aus deinen öffentlichen Beiträgen.\n\nDer Bot antwortet genauso öffentlich oder privat, wie du ihn erwähnst. Er liest nur, was im Fediverse ohnehin öffentlich ist, also nie Beiträge nur für Follower und nie DMs. Einmal pro Konto und Tag, und immer nur für das Konto, das ihn erwähnt hat.\n\nIn English: {siblingHandle}\n\nFragen oder Probleme? {contact}\n\nAlle unsere Fediverse-Tools und -Projekte findest du gesammelt auf {fedwerk}.",
   "propLanguage": "Sprache",
   "propLanguageValue": "Deutsch",
