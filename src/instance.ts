@@ -13,6 +13,7 @@ import {
 import { SqliteRepository } from "@fedify/botkit-sqlite";
 import type { FederationQueueOptions, MessageQueue } from "@fedify/fedify";
 import { SqliteKvStore, SqliteMessageQueue } from "@fedify/sqlite";
+import { avatar } from "./avatar.ts";
 import { type BotConfig, cfg } from "./config.ts";
 import {
   FOOTER_CSS,
@@ -101,6 +102,7 @@ export function buildInstance(db: DatabaseSync, { consumeQueues = true } = {}) {
           link(QUESTIONS_HANDLE, QUESTIONS_URL),
           link("FedWerk", fedwerkUrl(config.locale)),
         ),
+        icon: avatar(),
         // The bot never follows back; see the assertion in main.ts.
         followerPolicy: "accept",
         properties,

@@ -188,6 +188,14 @@ describe("footer", () => {
     assert.match(response.headers.get("content-security-policy") ?? "", /sandbox/);
     assert.match(await response.text(), /<svg/);
   });
+
+  it("serves the bots' avatar as a PNG, since Mastodon rejects SVG avatars", async () => {
+    const response = await get("/avatar.png", { "x-forwarded-host": HOST });
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("content-type"), "image/png");
+    const png = new Uint8Array(await response.arrayBuffer());
+    assert.deepEqual([...png.subarray(1, 4)], [0x50, 0x4e, 0x47]);
+  });
 });
 
 describe("atom feed", () => {

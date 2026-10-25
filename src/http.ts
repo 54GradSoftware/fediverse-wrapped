@@ -1,8 +1,9 @@
-// The only place untrusted input reaches a response. Five routes of our own; the rest is
+// The only place untrusted input reaches a response. Six routes of our own; the rest is
 // BotKit's, whose HTML pages pages.ts rewrites on the way out.
 
 import { readFile } from "node:fs/promises";
 import { getLogger } from "@logtape/logtape";
+import { AVATAR_PATH, AVATAR_PNG } from "./avatar.ts";
 import { cfg } from "./config.ts";
 import type { Db } from "./db.ts";
 import { LOGO_PATH, LOGO_SVG } from "./footer.ts";
@@ -76,6 +77,17 @@ export function createFetchHandler(
       return new Response(new Uint8Array(LOGO_SVG), {
         headers: {
           "content-type": "image/svg+xml",
+          "cache-control": "public, max-age=86400",
+          "x-content-type-options": "nosniff",
+          "content-security-policy": "default-src 'none'; sandbox",
+        },
+      });
+    }
+
+    if (url.pathname === AVATAR_PATH) {
+      return new Response(new Uint8Array(AVATAR_PNG), {
+        headers: {
+          "content-type": "image/png",
           "cache-control": "public, max-age=86400",
           "x-content-type-options": "nosniff",
           "content-security-policy": "default-src 'none'; sandbox",
