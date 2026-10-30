@@ -64,6 +64,10 @@ export type Catalogue = {
   readonly dmTail: () => Block;
   /** Second post when there are eight tiles. */
   readonly secondPost: (actor: Actor, tail: Block) => Block;
+  /** Links the top post from the second post, which carries the resonance tile. */
+  readonly topPostLine: (link: Inline) => Block;
+  /** The link text itself, so a screen reader announces where it goes (WCAG 2.4.4). */
+  readonly topPostLinkLabel: string;
 
   // --- extra lines woven into a success reply -----------------------------
   readonly partialLine: string;
@@ -108,14 +112,14 @@ export type Catalogue = {
   readonly labelAccountSince: string;
   readonly labelMentioned: string;
   readonly labelFavouriteTag: string;
+  readonly labelTopPostLikes: string;
+  readonly labelTopPostBoosts: string;
 
   readonly hourValue: (hour: number) => string;
   readonly dayValue: (days: number) => string;
   readonly pagesValue: (pages: number) => string;
   readonly timesIn: (timeZone: string) => string;
   readonly starterLine: string;
-  /** Footer, left: "Fediverse Wrapped 2026". */
-  readonly footerTitle: (year: string) => string;
   /** Footer, right: the year the tile covers, "18.09.2025 bis 18.09.2026". */
   readonly dateRange: (from: string, to: string) => string;
 
@@ -124,6 +128,8 @@ export type Catalogue = {
 
   /** Alt-text scaffolding: "<bot>, <tile>, <handle>: <rows>". */
   readonly altIntro: (tile: string, handle: string) => string;
+  /** The faint background cloud, spelled out because its contrast is decorative only. */
+  readonly altCloud: (tags: string) => string;
 };
 
 /** One locale file as parsed, before any checking. */
@@ -314,6 +320,8 @@ export function buildCatalogue(locale: Locale, raw: RawLocale): Catalogue {
     shareTail: () => shareTail(hashtag(CAMPAIGN_TAG)),
     dmTail: block("dmTail"),
     secondPost: block("secondPost", "u", "tail"),
+    topPostLine: block("topPostLine", "link"),
+    topPostLinkLabel: str("topPostLinkLabel"),
 
     partialLine: str("partialLine"),
     engagementLine: str("engagementLine"),
@@ -355,13 +363,14 @@ export function buildCatalogue(locale: Locale, raw: RawLocale): Catalogue {
     labelAccountSince: str("labelAccountSince"),
     labelMentioned: str("labelMentioned"),
     labelFavouriteTag: str("labelFavouriteTag"),
+    labelTopPostLikes: str("labelTopPostLikes"),
+    labelTopPostBoosts: str("labelTopPostBoosts"),
 
     hourValue: line("hourValue", "n"),
     dayValue: line("dayValue", "n"),
     pagesValue: line("pagesValue", "n"),
     timesIn: line("timesIn", "timeZone"),
     starterLine: str("starterLine"),
-    footerTitle: line("footerTitle", "year"),
     dateRange: line("dateRange", "from", "to"),
 
     archetype: Object.fromEntries(
@@ -391,6 +400,7 @@ export function buildCatalogue(locale: Locale, raw: RawLocale): Catalogue {
     ) as Record<FunFactId, (value: number) => string>,
 
     altIntro: line("altIntro", "tile", "handle"),
+    altCloud: line("altCloud", "tags"),
   };
 
   for (const key of Object.keys(raw)) {

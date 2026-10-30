@@ -19,6 +19,11 @@ export type Post = {
   /** null when the server does not publish the count (Misskey, Pleroma, …). */
   readonly likes: number | null;
   readonly shares: number | null;
+  /**
+   * Same-origin https address of a top-level post with Public in its own `to`, else null.
+   * Unlisted posts and replies never get one: a public reply must not widen their reach.
+   */
+  readonly link: string | null;
 };
 
 export type Account = {
@@ -97,6 +102,8 @@ export type Stats = {
   readonly busiestMonth: { readonly key: string; readonly count: number } | null;
 
   readonly topHashtags: readonly { readonly tag: string; readonly count: number }[];
+  /** The same ranking as topHashtags, longer, for the background cloud. */
+  readonly cloudHashtags: readonly { readonly tag: string; readonly count: number }[];
   readonly distinctHashtags: number;
 
   readonly followers: number | null;
@@ -104,6 +111,12 @@ export type Stats = {
   readonly boostsReceived: number | null;
   /** How many posts carried engagement counts. Sums are non-null only when === posts. */
   readonly engagementKnown: number;
+  /** The linkable post with the most favourites plus boosts; null unless every count is known. */
+  readonly topPost: {
+    readonly link: string;
+    readonly likes: number;
+    readonly shares: number;
+  } | null;
 
   /** A COUNT, never handles: naming third parties in a boostable image is not ours to do. */
   readonly distinctAccountsMentioned: number;
@@ -118,6 +131,8 @@ type Counts = Omit<Stats, "archetype" | "funFact" | "partial">;
 
 /** Words to a printed page, as in the sibling web app. */
 const WORDS_PER_PAGE = 250;
+/** Enough tags to fill the background of the topics tile. */
+const CLOUD_HASHTAGS = 30;
 
 function bump<Key>(map: Map<Key, number>, key: Key): void {
   map.set(key, (map.get(key) ?? 0) + 1);
@@ -225,6 +240,8 @@ export async function computeStats(
   let likesReceived = 0;
   let boostsReceived = 0;
   let engagementKnown = 0;
+  let topPost: Stats["topPost"] = null;
+  let topPostAt = 0;
 
   for await (const post of posts) {
     if (post.kind === "boost") {
@@ -272,15 +289,33 @@ export async function computeStats(
       likesReceived += post.likes ?? 0;
       boostsReceived += post.shares ?? 0;
     }
+
+    // Boosts are the reach, so a tie in the sum goes to more boosts, then to the newer post.
+    if (post.link != null && post.likes != null && post.shares != null) {
+      const score = post.likes + post.shares;
+      const at = post.createdAt.getTime();
+      const best = topPost == null ? 0 : topPost.likes + topPost.shares;
+      const wins =
+        topPost == null
+          ? score > 0
+          : score > best ||
+            (score === best &&
+              (post.shares > topPost.shares ||
+                (post.shares === topPost.shares && at > topPostAt)));
+      if (wins) {
+        topPost = { link: post.link, likes: post.likes, shares: post.shares };
+        topPostAt = at;
+      }
+    }
   }
 
   // A sum over SOME posts is not a total, so partial coverage collapses to null
   // and the tile omits the row.
   const fullEngagement = ownPosts > 0 && engagementKnown === ownPosts;
 
-  const topHashtags = [...tagCounts.entries()]
+  const rankedHashtags = [...tagCounts.entries()]
     .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
-    .slice(0, 4)
+    .slice(0, CLOUD_HASHTAGS)
     .map(([key, count]) => {
       const casings = tagDisplay.get(key);
       let display = key;
@@ -331,7 +366,8 @@ export async function computeStats(
     postsByHour,
     busiestMonth,
 
-    topHashtags,
+    topHashtags: rankedHashtags.slice(0, 4),
+    cloudHashtags: rankedHashtags,
     distinctHashtags: tagCounts.size,
 
     // A hidden follower collection publishes no totalItems; 0 would be a wrong claim,
@@ -340,6 +376,8 @@ export async function computeStats(
     likesReceived: fullEngagement ? likesReceived : null,
     boostsReceived: fullEngagement ? boostsReceived : null,
     engagementKnown,
+    // Shown only beside complete sums, so the tile and the reply link always agree.
+    topPost: fullEngagement ? topPost : null,
 
     distinctAccountsMentioned: mentioned.size,
     accountSince: account.accountSince,

@@ -471,6 +471,7 @@ async function toPost(
       words: 0,
       likes: null,
       shares: null,
+      link: null,
     };
   }
   if (!(item instanceof Create)) return null;
@@ -561,10 +562,22 @@ async function toPost(
 
   const content = note.content == null ? "" : htmlToText(String(note.content));
   const summary = note.summary == null ? "" : String(note.summary).trim();
+  const kind = note.replyTargetIds.length > 0 ? "reply" : "post";
+
+  // Only a post that was public on its own may be linked from a public reply; Public in cc
+  // only (unlisted) would gain reach it never had. The human-facing url wins over the id.
+  const publicTo = (noteAddressed ? note : item).toIds.some(
+    (uri) => uri.href === PUBLIC_COLLECTION.href,
+  );
+  const shown = note.url instanceof URL ? note.url : (note.url?.href ?? null);
+  const linkTarget = [shown, note.id].find(
+    (candidate): candidate is URL =>
+      candidate != null && sameOriginHttps(candidate, origin),
+  );
 
   return {
     createdAt: new Date(published.epochMilliseconds),
-    kind: note.replyTargetIds.length > 0 ? "reply" : "post",
+    kind,
     tags: [...new Set(tags)],
     mentions: [...new Set(mentions)],
     attachments,
@@ -577,6 +590,10 @@ async function toPost(
     words: content === "" ? 0 : content.split(/\s+/).filter(Boolean).length,
     likes,
     shares,
+    link:
+      kind === "post" && publicTo && linkTarget != null
+        ? linkTarget.href
+        : null,
   };
 }
 

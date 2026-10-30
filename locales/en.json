@@ -32,6 +32,8 @@
   "shareTail": "Sharing very much encouraged! If you share the images yourself, use {tag} so others can find them.",
   "dmTail": "Want a version you can boost? Just mention the bot publicly.",
   "secondPost": "{u} …and part two 📸\n\n{tail}",
+  "topPostLine": "Here is {link}.",
+  "topPostLinkLabel": "your biggest hit of the year",
   "partialLine": "Your year was too big for the bot 😅 Numbers are a lower bound.",
   "engagementLine": "Your server doesn't publish favourite and boost counts over ActivityPub, so those stats aren't here.",
   "tzHintLine": "Different timezone? Add tz=America/New_York next time.",
@@ -70,12 +72,13 @@
   "labelAccountSince": "📅 on this server since",
   "labelMentioned": "👤 accounts mentioned",
   "labelFavouriteTag": "🥇 favourite hashtag",
+  "labelTopPostLikes": "🏆 Top post, favourites",
+  "labelTopPostBoosts": "🏆 Top post, boosts",
   "hourValue": "{n}:00",
   "dayValue": "{n, plural, one {# day} other {# days}}",
   "pagesValue": "{n, plural, one {# page} other {# pages}}",
   "timesIn": "Times in {timeZone}",
   "starterLine": "Every account starts somewhere 🌱",
-  "footerTitle": "Fediverse Wrapped {year}",
   "dateRange": "{from} to {to}",
   "archetype": {
     "altTextHero": {
@@ -123,5 +126,6 @@
     "longPost": "Your longest post ran to {n, number} characters.",
     "everyOtherDay": "{n, number} active days, better than every other day."
   },
-  "altIntro": "Fediverse Wrapped, {tile}, {handle}:"
+  "altIntro": "Fediverse Wrapped, {tile}, {handle}:",
+  "altCloud": "More hashtags in the background: {tags}"
 }

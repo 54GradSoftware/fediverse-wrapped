@@ -1,24 +1,30 @@
+import "./env.ts";
 import assert from "node:assert/strict";
 import { readdirSync } from "node:fs";
 import { describe, it } from "node:test";
 import { fileURLToPath } from "node:url";
 import { Resvg } from "@resvg/resvg-js";
+import { overlaps } from "../src/decor.ts";
 import { type Account, type Coverage, computeStats, type Post } from "../src/stats.ts";
+import { catalogues } from "../src/strings.ts";
 import {
   buildTiles,
   escapeXml,
   FULL_SET_THRESHOLD,
   fitHandle,
   graphemes,
+  layoutTile,
   maxRowsFor,
   renderAlt,
   renderSvg,
   renderTiles,
   SIZE,
   STARTER_THRESHOLD,
+  SURFACE,
   tilePosts,
   WORDS_TILE_PAGES,
 } from "../src/tiles.ts";
+import { richStats } from "./helpers.ts";
 
 const FONTS = fileURLToPath(new URL("../fonts/", import.meta.url));
 const fontFilesOf = (dir: string) =>
@@ -41,6 +47,7 @@ async function statsFor(count: number, over: Partial<Post> = {}, handle = "a@exa
     words: 20 + (index % 30),
     likes: 2,
     shares: 1,
+    link: null,
     ...over,
   }));
   async function* feed() {
@@ -185,6 +192,82 @@ describe("svg safety", () => {
   });
 });
 
+describe("design", () => {
+  it("paints every tile on the flat dark surface, without gradient or confetti", async () => {
+    const stats = await richStats();
+    for (const [index, tile] of buildTiles(stats, "de").entries()) {
+      const markup = renderSvg(tile, stats, index, "de");
+      assert.ok(markup.includes(`fill="${SURFACE}"`), tile.id);
+      assert.equal(/Gradient|<circle|<polygon/.test(markup), false, tile.id);
+    }
+  });
+
+  it("renders the same picture every time", async () => {
+    const stats = await richStats();
+    for (const [index, tile] of buildTiles(stats, "en").entries()) {
+      assert.equal(renderSvg(tile, stats, index, "en"), renderSvg(tile, stats, index, "en"));
+    }
+  });
+});
+
+describe("hashtag cloud", () => {
+  it("draws the tags after the foreground four, inside the tile, never on each other", async () => {
+    const stats = await richStats();
+    const topics = buildTiles(stats, "de").find((model) => model.id === "topics")!;
+    const foreground = new Set(stats.topHashtags.map((tag) => `#${tag.tag}`));
+    const { cloud } = layoutTile(topics, stats, 2, "de");
+    assert.ok(cloud.length >= 3, `only ${cloud.length} cloud words placed`);
+    for (const [index, word] of cloud.entries()) {
+      assert.equal(foreground.has(word.text), false, `${word.text} is drawn twice`);
+      assert.ok(word.box.left >= 0 && word.box.right <= SIZE, word.text);
+      assert.ok(word.box.top >= 150 && word.box.bottom <= 936, word.text);
+      for (const other of cloud.slice(index + 1)) {
+        assert.equal(overlaps(word.box, other.box), false, `${word.text} / ${other.text}`);
+      }
+    }
+  });
+
+  it("is left out below five hashtags, so a sparse tile stays calm", async () => {
+    const stats = await statsFor(200);
+    const topics = buildTiles(stats, "de").find((model) => model.id === "topics")!;
+    assert.equal(topics.cloud, undefined);
+  });
+
+  it("cannot be broken out of by a hostile hashtag", async () => {
+    const stats = await richStats(["</text><script>alert(1)</script>"]);
+    const topics = buildTiles(stats, "de").find((model) => model.id === "topics")!;
+    assert.ok(
+      topics.cloud?.some((word) => word.text.includes("<script>")),
+      "not in the cloud",
+    );
+    const markup = renderSvg(topics, stats, 2, "de");
+    assert.equal(markup.includes("<script>"), false);
+  });
+});
+
+describe("top post", () => {
+  it("is on the resonance tile when the year has one", async () => {
+    const stats = await richStats();
+    assert.ok(stats.topPost != null);
+    for (const locale of ["de", "en"] as const) {
+      const catalogue = catalogues[locale];
+      const resonance = buildTiles(stats, locale).find((model) => model.id === "resonance")!;
+      assert.deepEqual(resonance.rows.slice(0, 2), [
+        { label: catalogue.labelTopPostLikes, value: "412" },
+        { label: catalogue.labelTopPostBoosts, value: "133" },
+      ]);
+    }
+  });
+
+  it("is not on the resonance tile when no post can be linked", async () => {
+    const stats = await statsFor(200);
+    assert.equal(stats.topPost, null);
+    const resonance = buildTiles(stats, "de").find((model) => model.id === "resonance")!;
+    const labels = resonance.rows.map((row) => row.label);
+    assert.equal(labels.includes(catalogues.de.labelTopPostLikes), false);
+  });
+});
+
 describe("handles", () => {
   it("keeps the username whole and shortens the domain", () => {
     const long = "someone@a-really-very-long-domain-name.example.test";
@@ -257,10 +340,16 @@ describe("rendering", () => {
 });
 
 describe("footer and words", () => {
-  it("always says Fediverse Wrapped with the year", async () => {
+  it("names the service host in the footer and the year in the header", async () => {
     const stats = await statsFor(200);
     const svg = renderSvg(buildTiles(stats, "de")[0]!, stats, 0, "de");
-    assert.ok(svg.includes("Fediverse Wrapped 2026"), "footer must carry the year");
+    assert.ok(svg.includes("wrapped.example.test"), "footer must carry the host");
+    assert.ok(svg.includes("1 · 2026"), "header must carry the year");
+  });
+
+  it("shows the words tile second and the rhythm tile fifth", async () => {
+    const ids = buildTiles(await statsFor(647), "de").map((model) => model.id);
+    assert.deepEqual(ids.slice(0, 5), ["numbers", "words", "topics", "type", "rhythm"]);
   });
 
   it("writes the date range in the reader's own format, not ISO", async () => {
@@ -296,7 +385,7 @@ describe("footer and words", () => {
     const blog = await statsFor(STARTER_THRESHOLD, { words: 1000 });
     assert.ok(blog.bookPages >= WORDS_TILE_PAGES);
     const ids = buildTiles(blog, "de").map((model) => model.id);
-    assert.deepEqual(ids, ["numbers", "rhythm", "words", "type"]);
+    assert.deepEqual(ids, ["numbers", "words", "rhythm", "type"]);
 
     // 99 posts at the 500-character limit stay under the cutoff.
     const toots = await statsFor(FULL_SET_THRESHOLD - 1, { words: 80 });

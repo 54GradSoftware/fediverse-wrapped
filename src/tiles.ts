@@ -4,24 +4,39 @@
 import { readdirSync } from "node:fs";
 import { renderAsync } from "@resvg/resvg-js";
 import { encode } from "html-entities";
-import type { Locale } from "./config.ts";
+import { cfg, type Locale } from "./config.ts";
+import { type Box, type CloudWord, layoutCloud, textBox } from "./decor.ts";
 import { argmax, pickFunFact, type Stats } from "./stats.ts";
-import { type Catalogue, catalogueFor, type Formatters, formatters } from "./strings.ts";
+import {
+  type Catalogue,
+  catalogueFor,
+  type Formatters,
+  formatters,
+} from "./strings.ts";
 
 export const SIZE = 1080;
 const MARGIN = 80;
-const SURFACE = "#0f1115";
-const INK = "#ffffff";
-const INK_SOFT = "#c6c8cf";
-const INK_MUTED = "#8b8f9a";
-const HAIRLINE = "#262a33";
 
-const ACCENT = {
+// One flat dark surface for every tile; only the accent changes. WCAG 2.2 AA:
+// test/a11y.test.ts holds every text colour and every bar to its ratio on SURFACE.
+export const SURFACE = "#0f1115";
+export const INK = "#ffffff";
+/** Labels and the small text. */
+export const INK_SOFT = "#c6c8cf";
+/** 5.8:1, so never for the smallest text, which is held to 7:1. */
+export const INK_MUTED = "#8b8f9a";
+const HAIRLINE = "#262a33";
+/** Title pill, hero value, chart bars and the cloud. */
+export const ACCENT = {
   numbers: "#3987e5",
   rhythm: "#1baf7a",
   topics: "#9085e9",
   type: "#eb6834",
 } as const;
+export const CLOUD_OPACITY = { min: 0.08, max: 0.18 } as const;
+export const BAR_REST_OPACITY = 0.7;
+const CLOUD_AREA: Box = { left: 40, top: 160, right: SIZE - 40, bottom: 920 };
+const CLOUD_MIN_TAGS = 5;
 
 /** Below this many posts a full four-tile set would be mostly empty rows. */
 export const STARTER_THRESHOLD = 10;
@@ -53,7 +68,8 @@ function notesTopOf(noteCount: number): number {
 /** How many rows fit above the notes and the footer. */
 export function maxRowsFor(hasChart: boolean, noteCount: number): number {
   const rowsTop = hasChart ? ROWS_TOP_WITH_CHART : ROWS_TOP_PLAIN;
-  const rowsBottom = (noteCount > 0 ? notesTopOf(noteCount) - 34 : NOTES_BASELINE) - 0;
+  const rowsBottom =
+    (noteCount > 0 ? notesTopOf(noteCount) - 34 : NOTES_BASELINE) - 0;
   return Math.max(0, Math.floor((rowsBottom - rowsTop) / ROW_GAP) + 1);
 }
 
@@ -66,7 +82,12 @@ export type TileModel = {
   readonly hero: { readonly value: string; readonly label: string };
   readonly rows: readonly TileRow[];
   /** Seven Monday-first bars, drawn on the rhythm tile only. */
-  readonly chart?: { readonly values: readonly number[]; readonly labels: readonly string[] };
+  readonly chart?: {
+    readonly values: readonly number[];
+    readonly labels: readonly string[];
+  };
+  /** Faint background hashtags on the topics tile; decorative, spelled out in the alt text. */
+  readonly cloud?: readonly { readonly text: string; readonly count: number }[];
   /** Honest disclosures; a tile can need two at once. */
   readonly notes: readonly string[];
 };
@@ -82,7 +103,8 @@ function truncate(value: string, max: number): string {
   return parts.length <= max ? value : `${parts.slice(0, max - 1).join("")}…`;
 }
 
-export const escapeXml = (value: string): string => encode(value, { level: "xml" });
+export const escapeXml = (value: string): string =>
+  encode(value, { level: "xml" });
 
 // The only way text gets into the document. Every interpolation is escaped,
 // so there is no path from a remote string to raw SVG markup.
@@ -141,29 +163,43 @@ export function buildTiles(stats: Stats, locale: Locale): TileModel[] {
 
   // One, four or eight tiles, never a count Mastodon renders as tall crops. Membership never
   // depends on which stats exist, or a tile silently disappears and the alt text lies.
-  if (stats.posts < STARTER_THRESHOLD) return [starterTile(stats, catalogue, format, notes)];
+  if (stats.posts < STARTER_THRESHOLD)
+    return [starterTile(stats, catalogue, format, notes)];
 
   // Blogs (WriteFreely, WordPress, Ghost) federate few, very long posts, so below the full set
   // the words tile replaces topics.
   const fullSet = stats.posts >= FULL_SET_THRESHOLD;
   const showsWords = fullSet || stats.bookPages >= WORDS_TILE_PAGES;
   // The words tile already prints the book pages; the fun fact says something else.
-  const funFact = showsWords ? pickFunFact(stats, new Set(["bookPages"])) : stats.funFact;
+  const funFact = showsWords
+    ? pickFunFact(stats, new Set(["bookPages"]))
+    : stats.funFact;
 
   const numbers = numbersTile(stats, catalogue, format, notes);
-  const rhythm = rhythmTile(stats, catalogue, format, notes);
+  // Words takes the second slot and its green; rhythm moves back and turns purple, so no post
+  // shows two tiles of one accent side by side.
+  const rhythm = rhythmTile(
+    stats,
+    catalogue,
+    format,
+    notes,
+    showsWords ? ACCENT.topics : ACCENT.rhythm,
+  );
   const topics = topicsTile(stats, catalogue, format, notes);
   const type = typeTile(stats, catalogue, format, notes, funFact);
   const words = wordsTile(stats, catalogue, format, notes);
 
-  if (!fullSet) return [numbers, rhythm, showsWords ? words : topics, type];
+  if (!fullSet)
+    return showsWords
+      ? [numbers, words, rhythm, type]
+      : [numbers, rhythm, topics, type];
 
   return [
     numbers,
-    rhythm,
+    words,
     topics,
     type,
-    words,
+    rhythm,
     resonanceTile(stats, catalogue, format, notes),
     mediaTile(stats, catalogue, format, notes),
     communityTile(stats, catalogue, format, notes),
@@ -199,7 +235,8 @@ function numbersTile(
     catalogue.labelBoostsReceived,
     stats.boostsReceived == null ? null : format.num(stats.boostsReceived),
   );
-  if (stats.withCw > 0) pushRow(rows, catalogue.labelWithCw, format.num(stats.withCw));
+  if (stats.withCw > 0)
+    pushRow(rows, catalogue.labelWithCw, format.num(stats.withCw));
 
   const own = [...notes];
   // Tells "this server publishes no counts" apart from "you were never favourited".
@@ -221,6 +258,7 @@ function rhythmTile(
   catalogue: Catalogue,
   format: Formatters,
   notes: string[],
+  accent: string,
 ): TileModel {
   const busiestWeekday = argmax(stats.postsByWeekday);
   const busiestHour = argmax(stats.postsByHour);
@@ -242,7 +280,7 @@ function rhythmTile(
   return {
     id: "rhythm",
     title: catalogue.tileRhythm,
-    accent: ACCENT.rhythm,
+    accent,
     hero: {
       // Never empty in practice: this tile needs posts, so some weekday has one.
       value: busiestWeekday == null ? "" : format.weekday(busiestWeekday),
@@ -278,7 +316,10 @@ function topicsTile(
       id: "topics",
       title: catalogue.tileTopics,
       accent: ACCENT.topics,
-      hero: { value: format.num(stats.characters), label: bare(catalogue.labelCharacters) },
+      hero: {
+        value: format.num(stats.characters),
+        label: bare(catalogue.labelCharacters),
+      },
       rows: rows.slice(0, maxRowsFor(false, Math.min(notes.length, 2))),
       notes: notes.slice(0, 2),
     };
@@ -289,7 +330,22 @@ function topicsTile(
     label: `#${truncate(tag.tag, 22)}`,
     value: `${format.num(tag.count)}×`,
   }));
-  pushRow(rows, catalogue.labelDistinctHashtags, format.num(stats.distinctHashtags));
+  pushRow(
+    rows,
+    catalogue.labelDistinctHashtags,
+    format.num(stats.distinctHashtags),
+  );
+
+  // The cloud holds the tags after the four in the foreground, so none is drawn twice.
+  const cloud =
+    stats.cloudHashtags.length >= CLOUD_MIN_TAGS
+      ? stats.cloudHashtags
+          .slice(stats.topHashtags.length)
+          .map((tag) => ({
+            text: `#${truncate(tag.tag, 22)}`,
+            count: tag.count,
+          }))
+      : undefined;
 
   return {
     id: "topics",
@@ -300,6 +356,7 @@ function topicsTile(
       label: `${format.num(first!.count)}× · ${bare(catalogue.labelFavouriteTag)}`,
     },
     rows: rows.slice(0, maxRowsFor(false, Math.min(notes.length, 2))),
+    ...(cloud == null ? {} : { cloud }),
     notes: notes.slice(0, 2),
   };
 }
@@ -324,10 +381,15 @@ function typeTile(
     stats.accountSince == null ? null : format.month(stats.accountSince),
   );
   // A count, never handles: naming third parties in a boostable image needs their consent.
-  pushRow(rows, catalogue.labelMentioned, format.num(stats.distinctAccountsMentioned));
+  pushRow(
+    rows,
+    catalogue.labelMentioned,
+    format.num(stats.distinctAccountsMentioned),
+  );
 
   const own = [...notes];
-  if (funFact != null) own.unshift(catalogue.funFact[funFact.id](funFact.value));
+  if (funFact != null)
+    own.unshift(catalogue.funFact[funFact.id](funFact.value));
   const notesOut = own.slice(0, 2);
 
   return {
@@ -347,7 +409,11 @@ function wordsTile(
   notes: string[],
 ): TileModel {
   const rows: TileRow[] = [];
-  pushRow(rows, catalogue.labelBookPages, catalogue.pagesValue(stats.bookPages));
+  pushRow(
+    rows,
+    catalogue.labelBookPages,
+    catalogue.pagesValue(stats.bookPages),
+  );
   pushRow(rows, catalogue.labelAvgWords, format.num(stats.avgWordsPerPost));
   pushRow(rows, catalogue.labelLongestPost, format.num(stats.longestPost));
   pushRow(rows, catalogue.labelCharacters, format.num(stats.characters));
@@ -355,7 +421,7 @@ function wordsTile(
   return {
     id: "words",
     title: catalogue.tileWords,
-    accent: ACCENT.topics,
+    accent: ACCENT.rhythm,
     hero: { value: format.num(stats.words), label: bare(catalogue.labelWords) },
     rows: rows.slice(0, maxRowsFor(false, notesOut.length)),
     notes: notesOut,
@@ -375,15 +441,37 @@ function resonanceTile(
   const notesOut = [...notes];
 
   if (known) {
-    const perPost = (total: number) => format.dec(stats.posts > 0 ? total / stats.posts : 0);
-    pushRow(rows, catalogue.labelBoostsReceived, format.num(stats.boostsReceived ?? 0));
+    const perPost = (total: number) =>
+      format.dec(stats.posts > 0 ? total / stats.posts : 0);
+    // First, so a full tile drops a sum row rather than the post the reply links to.
+    if (stats.topPost != null) {
+      pushRow(
+        rows,
+        catalogue.labelTopPostLikes,
+        format.num(stats.topPost.likes),
+      );
+      pushRow(
+        rows,
+        catalogue.labelTopPostBoosts,
+        format.num(stats.topPost.shares),
+      );
+    }
+    pushRow(
+      rows,
+      catalogue.labelBoostsReceived,
+      format.num(stats.boostsReceived ?? 0),
+    );
     pushRow(rows, catalogue.labelAvgLikes, perPost(stats.likesReceived ?? 0));
     pushRow(rows, catalogue.labelAvgBoosts, perPost(stats.boostsReceived ?? 0));
     pushRow(rows, catalogue.labelReplies, format.num(stats.replies));
   } else {
     notesOut.push(catalogue.engagementLine);
     pushRow(rows, catalogue.labelBoosts, format.num(stats.boosts));
-    pushRow(rows, catalogue.labelMentioned, format.num(stats.distinctAccountsMentioned));
+    pushRow(
+      rows,
+      catalogue.labelMentioned,
+      format.num(stats.distinctAccountsMentioned),
+    );
     pushRow(rows, catalogue.labelWithMedia, format.num(stats.withMedia));
   }
 
@@ -397,7 +485,10 @@ function resonanceTile(
           value: format.num(stats.likesReceived ?? 0),
           label: bare(catalogue.labelLikesReceived),
         }
-      : { value: format.num(stats.replies), label: bare(catalogue.labelReplies) },
+      : {
+          value: format.num(stats.replies),
+          label: bare(catalogue.labelReplies),
+        },
     rows: rows.slice(0, maxRowsFor(false, trimmed.length)),
     notes: trimmed,
   };
@@ -427,7 +518,10 @@ function mediaTile(
     id: "media",
     title: catalogue.tileMedia,
     accent: ACCENT.rhythm,
-    hero: { value: format.num(stats.withMedia), label: bare(catalogue.labelWithMedia) },
+    hero: {
+      value: format.num(stats.withMedia),
+      label: bare(catalogue.labelWithMedia),
+    },
     rows: rows.slice(0, maxRowsFor(false, notesOut.length)),
     notes: notesOut,
   };
@@ -440,7 +534,11 @@ function communityTile(
   notes: string[],
 ): TileModel {
   const rows: TileRow[] = [];
-  pushRow(rows, catalogue.labelMentioned, format.num(stats.distinctAccountsMentioned));
+  pushRow(
+    rows,
+    catalogue.labelMentioned,
+    format.num(stats.distinctAccountsMentioned),
+  );
   pushRow(rows, catalogue.labelReplies, format.num(stats.replies));
   pushRow(rows, catalogue.labelBoosts, format.num(stats.boosts));
   pushRow(
@@ -456,8 +554,14 @@ function communityTile(
     // A hidden follower collection publishes nothing; fall back rather than claim zero.
     hero:
       stats.followers == null
-        ? { value: format.num(stats.replies), label: bare(catalogue.labelReplies) }
-        : { value: format.num(stats.followers), label: bare(catalogue.labelFollowers) },
+        ? {
+            value: format.num(stats.replies),
+            label: bare(catalogue.labelReplies),
+          }
+        : {
+            value: format.num(stats.followers),
+            label: bare(catalogue.labelFollowers),
+          },
     rows: rows.slice(0, maxRowsFor(false, notesOut.length)),
     notes: notesOut,
   };
@@ -482,7 +586,7 @@ function starterTile(
   return {
     id: "starter",
     title: catalogue.tileStarter,
-    accent: ACCENT.numbers,
+    accent: ACCENT.topics,
     hero: { value: format.num(stats.posts), label: catalogue.labelPosts },
     rows: rows.slice(0, maxRowsFor(false, Math.min(notes.length + 1, 2))),
     // Never a percentage or a comparison: for someone just starting, it reads as an invitation.
@@ -491,11 +595,21 @@ function starterTile(
 }
 
 /** Walks the same model as the picture, so alt text never omits or invents a row. */
-export function renderAlt(tile: TileModel, stats: Stats, locale: Locale): string {
+export function renderAlt(
+  tile: TileModel,
+  stats: Stats,
+  locale: Locale,
+): string {
   const catalogue = catalogueFor(locale);
   const parts = [`${tile.hero.value} ${tile.hero.label}`];
   for (const row of tile.rows) parts.push(`${row.label}: ${row.value}`);
   for (const note of tile.notes) parts.push(note);
+  // Exactly the cloud words the picture placed. The cloud area sits below the header, so the
+  // tile number cannot change which words fit.
+  const cloud = layoutTile(tile, stats, 0, locale).cloud;
+  if (cloud.length > 0) {
+    parts.push(catalogue.altCloud(cloud.map((word) => word.text).join(", ")));
+  }
   const sentence = `${catalogue.altIntro(tile.title, stats.handle)} ${parts.join(", ")}`;
   // Screen readers would announce emojis ("recycling symbol") before every number. Stripping
   // the whole sentence, not per field, keeps any new catalogue emoji out of the alt text.
@@ -506,17 +620,175 @@ export function renderAlt(tile: TileModel, stats: Stats, locale: Locale): string
     .trim();
 }
 
-function textNode(
-  left: number,
-  top: number,
-  value: string,
-  size: number,
-  fill: string,
-  options: { bold?: boolean; anchor?: "start" | "end" | "middle" } = {},
-): string {
-  const weight = options.bold === true ? 700 : 400;
-  const anchor = options.anchor ?? "start";
-  return svg`<text x="${left}" y="${top}" font-family="Inter" font-size="${size}" font-weight="${weight}" fill="${fill}" text-anchor="${anchor}" xml:space="preserve">${value}</text>`;
+/** One line of text on a tile. */
+export type TextItem = {
+  readonly left: number;
+  readonly baseline: number;
+  readonly value: string;
+  readonly size: number;
+  readonly bold: boolean;
+  readonly anchor: "start" | "end" | "middle";
+  readonly fill: string;
+  /** Notes and the footer: the smallest text, held to 7:1 instead of 4.5:1. */
+  readonly small: boolean;
+};
+
+export type BarItem = { readonly box: Box; readonly busiest: boolean };
+
+/** Everything a tile draws, with positions; renderSvg() only turns it into markup. */
+export type TileLayout = {
+  readonly texts: readonly TextItem[];
+  readonly bars: readonly BarItem[];
+  /** Hairlines and the title pill; decoration keeps clear of them too. */
+  readonly rules: readonly Box[];
+  readonly cloud: readonly CloudWord[];
+};
+
+export function boxOf(item: TextItem): Box {
+  return textBox(
+    item.left,
+    item.baseline,
+    item.value,
+    item.size,
+    item.bold,
+    item.anchor,
+  );
+}
+
+export function layoutTile(
+  tile: TileModel,
+  stats: Stats,
+  index: number,
+  locale: Locale,
+): TileLayout {
+  const catalogue = catalogueFor(locale);
+  const format = formatters(locale);
+  const right = SIZE - MARGIN;
+  const texts: TextItem[] = [];
+  const add = (
+    left: number,
+    baseline: number,
+    value: string,
+    size: number,
+    options: {
+      bold?: boolean;
+      anchor?: TextItem["anchor"];
+      fill?: string;
+      small?: boolean;
+    } = {},
+  ) => {
+    texts.push({
+      left,
+      baseline,
+      value,
+      size,
+      bold: options.bold ?? false,
+      anchor: options.anchor ?? "start",
+      fill: options.fill ?? (options.small ? INK_SOFT : INK),
+      small: options.small ?? false,
+    });
+  };
+
+  // Header: handle and tile number, so a single boosted image still says whose year it is.
+  add(MARGIN, 108, fitHandle(stats.handle), 34, { bold: true });
+  add(right, 108, `${index + 1} · ${stats.to.slice(0, 4)}`, 30, {
+    anchor: "end",
+    fill: INK_MUTED,
+  });
+  const rules: Box[] = [
+    { left: MARGIN, top: 140, right: SIZE - MARGIN, bottom: 142 },
+    { left: MARGIN, top: 200, right: MARGIN + 14, bottom: 252 },
+    {
+      left: MARGIN,
+      top: FOOTER_RULE_Y,
+      right: SIZE - MARGIN,
+      bottom: FOOTER_RULE_Y + 2,
+    },
+  ];
+  add(MARGIN + 34, 244, tile.title, 50, { bold: true });
+
+  const size = heroSize(tile.hero.value);
+  add(MARGIN, 300 + size * 0.78, tile.hero.value, size, {
+    bold: true,
+    fill: tile.accent,
+  });
+  add(MARGIN, 300 + size * 0.78 + 56, tile.hero.label, 38, { fill: INK_SOFT });
+
+  const bars: BarItem[] = [];
+  if (tile.chart != null) {
+    const max = Math.max(1, ...tile.chart.values);
+    const slot = (SIZE - MARGIN * 2) / 7;
+    const barWidth = Math.round(slot * 0.56);
+    const maxHeight = 110;
+    for (let day = 0; day < 7; day++) {
+      const value = tile.chart.values[day] ?? 0;
+      const height = Math.max(3, Math.round((value / max) * maxHeight));
+      const left = Math.round(MARGIN + slot * day + (slot - barWidth) / 2);
+      const busiest = value === max;
+      bars.push({
+        box: {
+          left,
+          top: CHART_BASELINE - height,
+          right: left + barWidth,
+          bottom: CHART_BASELINE,
+        },
+        busiest,
+      });
+      const centre = Math.round(left + barWidth / 2);
+      add(centre, CHART_LABEL_Y, tile.chart.labels[day] ?? "", 26, {
+        anchor: "middle",
+        fill: INK_MUTED,
+      });
+      if (busiest) {
+        add(centre, CHART_BASELINE - height - 12, format.num(value), 24, {
+          bold: true,
+          anchor: "middle",
+        });
+      }
+    }
+  }
+
+  // buildTiles() already capped the rows to what fits, so there is no clamping here.
+  const rowsTop = tile.chart != null ? ROWS_TOP_WITH_CHART : ROWS_TOP_PLAIN;
+  tile.rows.forEach((row, rowIndex) => {
+    const top = rowsTop + rowIndex * ROW_GAP;
+    add(MARGIN, top, truncate(row.label, 32), 36, { fill: INK_SOFT });
+    add(right, top, truncate(row.value, 20), 36, { bold: true, anchor: "end" });
+  });
+
+  const notesTop = notesTopOf(tile.notes.length);
+  tile.notes.forEach((note, noteIndex) => {
+    add(MARGIN, notesTop + noteIndex * NOTE_LINE, truncate(note, 64), 24, {
+      small: true,
+    });
+  });
+
+  // Where the image comes from; the year already stands in the header.
+  add(MARGIN, FOOTER_TEXT_Y, cfg.canonicalHost, 28, { small: true });
+  // The window in the reader's own date format; an ISO date reads as a machine artefact.
+  add(
+    right,
+    FOOTER_TEXT_Y,
+    catalogue.dateRange(format.date(stats.from), format.date(stats.to)),
+    26,
+    { anchor: "end", small: true },
+  );
+
+  const keepClear = [
+    ...texts.map(boxOf),
+    ...bars.map((bar) => bar.box),
+    ...rules,
+  ];
+  const cloud =
+    tile.cloud == null ? [] : layoutCloud(tile.cloud, keepClear, CLOUD_AREA);
+  return { texts, bars, rules, cloud };
+}
+
+const round = (value: number) => Math.round(value * 10) / 10;
+
+function textNode(item: TextItem): string {
+  const weight = item.bold ? 700 : 400;
+  return svg`<text x="${round(item.left)}" y="${round(item.baseline)}" font-family="Inter" font-size="${item.size}" font-weight="${weight}" fill="${item.fill}" text-anchor="${item.anchor}" xml:space="preserve">${item.value}</text>`;
 }
 
 export function renderSvg(
@@ -525,96 +797,39 @@ export function renderSvg(
   index: number,
   locale: Locale,
 ): string {
-  const catalogue = catalogueFor(locale);
-  const right = SIZE - MARGIN;
+  const layout = layoutTile(tile, stats, index, locale);
   const parts: string[] = [];
 
   parts.push(svg`<rect width="${SIZE}" height="${SIZE}" fill="${SURFACE}"/>`);
 
-  // Header: handle and tile number, so a single boosted image still says whose year it is.
-  parts.push(textNode(MARGIN, 108, fitHandle(stats.handle), 34, INK, { bold: true }));
-  parts.push(
-    textNode(right, 108, `${index + 1} · ${stats.to.slice(0, 4)}`, 30, INK_MUTED, {
-      anchor: "end",
-    }),
-  );
-  parts.push(
-    svg`<rect x="${MARGIN}" y="140" width="${SIZE - MARGIN * 2}" height="2" fill="${HAIRLINE}"/>`,
-  );
-
-  parts.push(
-    svg`<rect x="${MARGIN}" y="200" width="14" height="52" rx="7" fill="${tile.accent}"/>`,
-  );
-  parts.push(textNode(MARGIN + 34, 244, tile.title, 50, INK, { bold: true }));
-
-  const size = heroSize(tile.hero.value);
-  parts.push(
-    textNode(MARGIN, 300 + size * 0.78, tile.hero.value, size, tile.accent, { bold: true }),
-  );
-  parts.push(textNode(MARGIN, 300 + size * 0.78 + 56, tile.hero.label, 38, INK_SOFT));
-
-  if (tile.chart != null) {
-    const max = Math.max(1, ...tile.chart.values);
-    const slot = (SIZE - MARGIN * 2) / 7;
-    const barWidth = slot * 0.56;
-    const maxHeight = 110;
-    for (let index = 0; index < 7; index++) {
-      const value = tile.chart.values[index] ?? 0;
-      const height = Math.max(3, Math.round((value / max) * maxHeight));
-      const left = MARGIN + slot * index + (slot - barWidth) / 2;
-      parts.push(
-        svg`<rect x="${Math.round(left)}" y="${CHART_BASELINE - height}" width="${Math.round(barWidth)}" height="${height}" rx="6" fill="${tile.accent}" opacity="${value === max ? 1 : 0.45}"/>`,
-      );
-      parts.push(
-        textNode(
-          Math.round(left + barWidth / 2),
-          CHART_LABEL_Y,
-          tile.chart.labels[index] ?? "",
-          26,
-          INK_MUTED,
-          { anchor: "middle" },
-        ),
-      );
-    }
+  // The heaviest word is the most opaque, still far below the 4.5:1 that text needs, which
+  // is why the cloud only fills gaps and every word is in the alt text.
+  for (const word of layout.cloud) {
+    const opacity =
+      CLOUD_OPACITY.min + (CLOUD_OPACITY.max - CLOUD_OPACITY.min) * word.weight;
+    parts.push(
+      svg`<text x="${round(word.left)}" y="${round(word.baseline)}" font-family="Inter" font-size="${word.size}" font-weight="700" fill="${tile.accent}" fill-opacity="${Math.round(opacity * 100) / 100}" xml:space="preserve">${word.text}</text>`,
+    );
   }
 
-  // buildTiles() already capped the rows to what fits, so there is no clamping here.
-  const rowsTop = tile.chart != null ? ROWS_TOP_WITH_CHART : ROWS_TOP_PLAIN;
-  tile.rows.forEach((row, index) => {
-    const top = rowsTop + index * ROW_GAP;
-    parts.push(textNode(MARGIN, top, truncate(row.label, 32), 36, INK_SOFT));
+  const [headerRule, pill, footerRule] = layout.rules;
+  for (const rule of [headerRule, footerRule]) {
+    if (rule == null) continue;
     parts.push(
-      textNode(right, top, truncate(row.value, 20), 36, INK, { bold: true, anchor: "end" }),
+      svg`<rect x="${rule.left}" y="${rule.top}" width="${rule.right - rule.left}" height="${rule.bottom - rule.top}" fill="${HAIRLINE}"/>`,
     );
-  });
-
-  const notesTop = notesTopOf(tile.notes.length);
-  tile.notes.forEach((note, index) => {
+  }
+  if (pill != null) {
     parts.push(
-      textNode(MARGIN, notesTop + index * NOTE_LINE, truncate(note, 64), 24, INK_MUTED),
+      svg`<rect x="${pill.left}" y="${pill.top}" width="${pill.right - pill.left}" height="${pill.bottom - pill.top}" rx="7" fill="${tile.accent}"/>`,
     );
-  });
-
-  parts.push(
-    svg`<rect x="${MARGIN}" y="${FOOTER_RULE_Y}" width="${SIZE - MARGIN * 2}" height="2" fill="${HAIRLINE}"/>`,
-  );
-  // The window in the reader's own date format; an ISO date reads as a machine artefact.
-  const format = formatters(locale);
-  parts.push(
-    textNode(MARGIN, FOOTER_TEXT_Y, catalogue.footerTitle(stats.to.slice(0, 4)), 28, INK_MUTED),
-  );
-  parts.push(
-    textNode(
-      right,
-      FOOTER_TEXT_Y,
-      catalogue.dateRange(format.date(stats.from), format.date(stats.to)),
-      26,
-      INK_MUTED,
-      {
-        anchor: "end",
-      },
-    ),
-  );
+  }
+  for (const bar of layout.bars) {
+    parts.push(
+      svg`<rect x="${bar.box.left}" y="${bar.box.top}" width="${bar.box.right - bar.box.left}" height="${bar.box.bottom - bar.box.top}" rx="6" fill="${tile.accent}" opacity="${bar.busiest ? 1 : BAR_REST_OPACITY}"/>`,
+    );
+  }
+  for (const item of layout.texts) parts.push(textNode(item));
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${SIZE}" height="${SIZE}" viewBox="0 0 ${SIZE} ${SIZE}">${raw(parts)}</svg>`;
 }
@@ -648,10 +863,17 @@ export async function renderTiles(
     // renderAsync rasterises on libuv's thread pool; the sync Resvg#render() would block the
     // event loop, stalling inbox deliveries and /healthz while a wrapped renders.
     const rendered = await renderAsync(markup, {
-      font: { fontFiles: files, loadSystemFonts: false, defaultFontFamily: "Inter" },
+      font: {
+        fontFiles: files,
+        loadSystemFonts: false,
+        defaultFontFamily: "Inter",
+      },
       fitTo: { mode: "width", value: SIZE },
     });
-    out.push({ png: Buffer.from(rendered.asPng()), alt: renderAlt(tile, stats, locale) });
+    out.push({
+      png: Buffer.from(rendered.asPng()),
+      alt: renderAlt(tile, stats, locale),
+    });
   }
   return out;
 }

@@ -23,6 +23,7 @@ You can only get a wrapped for your own account, one per day. If the bot cannot 
 - Never reads followers only posts, and fetches unsigned first.
 - Never follows anyone, and only analyses the account that mentioned it.
 - Never names other accounts on the images.
+- Links at most one post: the user's own public top post, never an unlisted post or a reply.
 - Posts are never stored. Details in [PRIVACY.md](PRIVACY.md).
 
 ## Compatibility
@@ -30,6 +31,11 @@ You can only get a wrapped for your own account, one per day. If the bot cannot 
 Tested against 35 implementations. Does **not** work with Pixelfed, Loops,
 GoToSocial, Lemmy, PieFed, the WordPress plugin, Micro.blog and Bridgy Fed,
 because they publish no readable outbox. The bot tells those users why.
+
+## Possible next features
+
+- **Moved accounts.** Today the bot only reads the account that mentioned it. Your new account lists the old one in `alsoKnownAs`, and the old
+  account points back with `movedTo`.
 
 ## Development
 

@@ -235,6 +235,11 @@ async function runJob(deps: WorkerDeps, job: Job): Promise<void> {
       stats.posts < STARTER_THRESHOLD
         ? catalogue.successStarter(actor, tail)
         : catalogue.success(actor, stats.timeZone, tail);
+    // Part two carries the resonance tile, so the top post it counts is linked there.
+    const secondTail =
+      stats.topPost == null
+        ? share
+        : text`${catalogue.topPostLine(link(catalogue.topPostLinkLabel, stats.topPost.link))}\n\n${share}`;
 
     // Marked BEFORE publishing: a crash in between loses one reply, while marking after would
     // post a second wrapped on retry. Losing one silently beats duplicating one visibly.
@@ -273,7 +278,7 @@ async function runJob(deps: WorkerDeps, job: Job): Promise<void> {
     // tag a direct message reaches nobody.
     for (const group of groups.slice(1)) {
       await published
-        .reply(catalogue.secondPost(actor, share), {
+        .reply(catalogue.secondPost(actor, secondTail), {
           visibility: job.visibility,
           language: locale,
           attachments: group,

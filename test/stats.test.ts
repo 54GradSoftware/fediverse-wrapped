@@ -32,6 +32,7 @@ function post(over: Partial<Post> = {}): Post {
     words: 2,
     likes: null,
     shares: null,
+    link: null,
     ...over,
   };
 }
@@ -133,6 +134,53 @@ describe("computeStats", () => {
       stats.topHashtags.map((hashtag) => hashtag.tag),
       ["a", "b"],
     );
+  });
+
+  it("keeps a longer hashtag ranking for the cloud, in the same order", async () => {
+    const tags = Array.from(
+      { length: 40 },
+      (_value, index) => `tag${String(index).padStart(2, "0")}`,
+    );
+    const stats = await run(tags.map((tag) => post({ tags: [tag] })));
+    assert.equal(stats.topHashtags.length, 4);
+    assert.equal(stats.cloudHashtags.length, 30);
+    assert.deepEqual(stats.cloudHashtags.slice(0, 4), stats.topHashtags);
+  });
+
+  it("finds the linkable post with the most favourites plus boosts", async () => {
+    const stats = await run([
+      post({ likes: 5, shares: 1, link: "https://x.test/1" }),
+      post({ likes: 40, shares: 2, link: "https://x.test/2" }),
+      // More reach but not linkable (unlisted or a reply): never the one linked.
+      post({ likes: 90, shares: 9, link: null }),
+    ]);
+    assert.deepEqual(stats.topPost, { link: "https://x.test/2", likes: 40, shares: 2 });
+  });
+
+  it("breaks a top post tie towards more boosts, then the newer post", async () => {
+    const older = new Date("2026-01-01T12:00:00Z");
+    const newer = new Date("2026-02-01T12:00:00Z");
+    const byBoosts = await run([
+      post({ likes: 8, shares: 2, link: "https://x.test/likes" }),
+      post({ likes: 5, shares: 5, link: "https://x.test/boosts" }),
+    ]);
+    assert.equal(byBoosts.topPost?.link, "https://x.test/boosts");
+    const byDate = await run([
+      post({ createdAt: newer, likes: 3, shares: 1, link: "https://x.test/newer" }),
+      post({ createdAt: older, likes: 3, shares: 1, link: "https://x.test/older" }),
+    ]);
+    assert.equal(byDate.topPost?.link, "https://x.test/newer");
+  });
+
+  it("has no top post without reach or without complete counts", async () => {
+    const quiet = await run([post({ likes: 0, shares: 0, link: "https://x.test/1" })]);
+    assert.equal(quiet.topPost, null, "a post nobody reacted to is no hit");
+    // Beside a missing sum, the tile cannot show it, so the reply must not link it either.
+    const partial = await run([
+      post({ likes: 9, shares: 3, link: "https://x.test/1" }),
+      post(),
+    ]);
+    assert.equal(partial.topPost, null);
   });
 
   it("places a Berlin-midnight post on the right local day and hour", async () => {

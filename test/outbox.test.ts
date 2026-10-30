@@ -464,6 +464,54 @@ describe("audience filtering", () => {
   });
 });
 
+describe("top post link", () => {
+  async function linksOf(items: unknown[]) {
+    const p1 = `${OUTBOX}?page=true`;
+    const { posts, calls } = await collect({ [OUTBOX]: root(p1), [p1]: page(p1, items) });
+    return { links: posts.map((post) => post.link), calls };
+  }
+
+  it("prefers the human-facing url and costs no extra request", async () => {
+    const { links, calls } = await linksOf([
+      create("1", "2026-09-01T10:00:00Z", { url: `${ORIGIN}/@a/1` }),
+      create("2", "2026-09-02T10:00:00Z"),
+    ]);
+    assert.deepEqual(links, [`${ORIGIN}/@a/1`, `${ORIGIN}/notes/2`]);
+    assert.deepEqual(calls, [OUTBOX, `${OUTBOX}?page=true`]);
+  });
+
+  it("never links somewhere else, falling back to the post's own id", async () => {
+    const { links } = await linksOf([
+      create("1", "2026-09-01T10:00:00Z", { url: "https://elsewhere.test/@a/1" }),
+    ]);
+    assert.deepEqual(links, [`${ORIGIN}/notes/1`]);
+  });
+
+  it("never links an unlisted post, a reply or a boost", async () => {
+    const audience = { to: [`${ACTOR}/followers`], cc: [PUBLIC] };
+    const { links } = await linksOf([
+      {
+        id: `${ORIGIN}/act/unlisted`,
+        type: "Create",
+        actor: ACTOR,
+        published: "2026-09-01T10:00:00Z",
+        ...audience,
+        object: note("unlisted", "2026-09-01T10:00:00Z", audience),
+      },
+      create("reply", "2026-09-02T10:00:00Z", { inReplyTo: "https://y.test/notes/1" }),
+      {
+        id: `${ORIGIN}/act/boost`,
+        type: "Announce",
+        actor: ACTOR,
+        published: "2026-09-03T10:00:00Z",
+        to: [PUBLIC],
+        object: "https://elsewhere.test/notes/9",
+      },
+    ]);
+    assert.deepEqual(links, [null, null, null]);
+  });
+});
+
 describe("referenced objects (Fedify-style servers such as Hackers' Pub)", () => {
   const noteAt = (id: string, published: string) => ({
     "@context": AS,
@@ -804,6 +852,7 @@ describe("timestamp sanity", () => {
     words: 0,
     likes: null,
     shares: null,
+    link: null,
   });
 
   it("rejects the far future and the far past", () => {

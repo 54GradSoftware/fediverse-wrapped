@@ -10,5 +10,9 @@ Fediverse Wrapped only reads what is already public.
   - The once a day list: a salted hash of your account, kept for 60 days.
   - The images: kept under an unguessable URL for 180 days, then deleted.
 - **Visibility:** the reply is exactly as public as your mention.
+- **Your top post:** the reply can link the public post of yours that got the
+  most favourites and boosts. Only posts that were public on their own qualify,
+  never unlisted posts and never replies. The link appears only in that reply;
+  the post itself is still not stored.
 
 Run by 54 Grad Software GmbH, https://www.54gradsoftware.de/
