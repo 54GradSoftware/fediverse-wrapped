@@ -39,7 +39,7 @@
     "html-entities": "^2.6.0",
     "intl-messageformat": "^12.1.4",
     "luxon": "^3.7.2",
-    "srvx": "^1.0.6"
+    "srvx": "^1.0.8"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.2",
