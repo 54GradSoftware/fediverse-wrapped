@@ -52,6 +52,11 @@ npm test && npm run typecheck && npm run lint
 `TESTING_MODE=true` runs a closed beta: the bot only answers DMs from accounts
 the operator added with `node ace follow @user@host`, accepted or still pending.
 
+`node ace resend` lists jobs that crashed before any reply went out (for example
+after an out of memory restart). `node ace resend --send` puts them back in the
+queue as if mentioned today, and the running bot answers them. Jobs that already
+got a reply, or whose account mentioned the bot again later, are skipped.
+
 ## Deployment
 
 Docker Compose on Coolify, both bots in one container. Production runs at

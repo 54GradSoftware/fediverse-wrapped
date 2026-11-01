@@ -317,6 +317,66 @@ export async function openDb(path: string, salt: string) {
       return { requeued: Number(requeued), abandoned: Number(abandoned) };
     },
 
+    // --- resending ---------------------------------------------------------
+
+    /** Jobs that ended with no reply at all: crashed while running or while publishing. */
+    async unansweredJobs(): Promise<Job[]> {
+      return (await jobs()
+        .where({ state: "failed", outcome: "crashed" })
+        .whereNull("reply_uri")
+        .orderBy("created_at")) as Job[];
+    },
+
+    // Any newer mention that was not refused: answered, on its way, or crashed as well, in
+    // which case that newer one is the job to resend. Only the newest per account goes out.
+    async hasLaterMention(actorHash: string, createdAt: number): Promise<boolean> {
+      const row = await jobs()
+        .select("message_id")
+        .where("actor_hash", actorHash)
+        .where("created_at", ">", createdAt)
+        .whereNot("state", "rejected")
+        .first();
+      return row != null;
+    },
+
+    // Back to 'queued' as if mentioned today: created_at moves to now and today's wrapped is
+    // claimed, so a new mention meanwhile is refused instead of starting a second walk. The
+    // claim may already exist when the crash was today; that row is this job's own. The update
+    // is a compare-and-swap, so a second run changes nothing. The actor comes back because
+    // finishing the job scrubbed it.
+    async reopenJob(
+      messageId: string,
+      actorId: string,
+      now: number,
+      day: string,
+    ): Promise<boolean> {
+      const actorHash = hashActor(actorId);
+      return await client.transaction(async (transaction) => {
+        const changed = await transaction
+          .from("jobs")
+          .where({
+            message_id: messageId,
+            state: "failed",
+            outcome: "crashed",
+            actor_hash: actorHash,
+          })
+          .whereNull("reply_uri")
+          .update({
+            state: "queued",
+            attempts: 0,
+            not_before: now,
+            created_at: now,
+            actor_id: actorId,
+            outcome: null,
+            finished_at: null,
+            last_error: null,
+          });
+        if (Number(changed) === 0) return false;
+        await claimReplyOn(transaction, actorHash, day, "wrapped", now);
+        return true;
+      });
+    },
+
     // --- daily ledger -----------------------------------------------------
 
     /** false means this account already used its one wrapped (or refusal) today. */

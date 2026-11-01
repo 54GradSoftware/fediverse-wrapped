@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { Person } from "@fedify/vocab";
-import type { DocumentLoader } from "@fedify/vocab-runtime";
+import { type DocumentLoader, getDocumentLoader } from "@fedify/vocab-runtime";
 import {
   classifyFetchError,
   clean,
@@ -23,6 +23,8 @@ const ORIGIN = "https://x.test";
 const ACTOR = `${ORIGIN}/users/a`;
 const OUTBOX = `${ACTOR}/outbox`;
 const NOW = new Date("2026-09-18T12:00:00Z");
+/** Fedify's own default: the ActivityStreams context is preloaded, no network. */
+const contextLoader = getDocumentLoader();
 
 /** Serves canned JSON-LD and counts every request, so we can assert on fetches. */
 function loaderOf(docs: Record<string, unknown>) {
@@ -94,7 +96,11 @@ const root = (first: string) => ({
 
 async function collect(docs: Record<string, unknown>) {
   const { load, calls } = loaderOf(docs);
-  const { outbox, loader } = await openOutbox(actor(), { unsigned: load, signed: load });
+  const { outbox, loader } = await openOutbox(actor(), {
+    unsigned: load,
+    signed: load,
+    contextLoader,
+  });
   const progress: WalkProgress = {
     partial: false,
     pages: 0,
@@ -103,7 +109,8 @@ async function collect(docs: Record<string, unknown>) {
     dereferenced: 0,
   };
   const posts: Post[] = [];
-  for await (const post of walkOutbox(actor(), outbox, loader, progress, NOW)) posts.push(post);
+  for await (const post of walkOutbox(actor(), outbox, loader, contextLoader, progress, NOW))
+    posts.push(post);
   return { posts, progress, calls };
 }
 
@@ -251,7 +258,10 @@ describe("hostile and broken collections", () => {
       preferredUsername: "a",
       outbox: new URL(evil),
     });
-    await assert.rejects(openOutbox(offOrigin, { unsigned: load, signed: load }), OutboxError);
+    await assert.rejects(
+      openOutbox(offOrigin, { unsigned: load, signed: load, contextLoader }),
+      OutboxError,
+    );
     assert.deepEqual(calls, [], "not even the signed fallback may go there");
   });
 
@@ -261,7 +271,11 @@ describe("hostile and broken collections", () => {
       [OUTBOX]: root(evil),
       [evil]: page(evil, [create("1", "2026-09-01T10:00:00Z")]),
     });
-    const { outbox, loader } = await openOutbox(actor(), { unsigned: load, signed: load });
+    const { outbox, loader } = await openOutbox(actor(), {
+      unsigned: load,
+      signed: load,
+      contextLoader,
+    });
     const progress: WalkProgress = {
       partial: false,
       pages: 0,
@@ -270,7 +284,14 @@ describe("hostile and broken collections", () => {
       dereferenced: 0,
     };
     await assert.rejects(async () => {
-      for await (const _post of walkOutbox(actor(), outbox, loader, progress, NOW)) {
+      for await (const _post of walkOutbox(
+        actor(),
+        outbox,
+        loader,
+        contextLoader,
+        progress,
+        NOW,
+      )) {
         // drain
       }
     }, OutboxError);
@@ -294,6 +315,115 @@ describe("hostile and broken collections", () => {
     assert.equal(posts.length, 0);
     assert.equal(progress.partial, true);
     assert.ok(progress.pages <= 6, `gave up after ${progress.pages} empty pages`);
+  });
+});
+
+describe("following next links", () => {
+  const LITEPUB = `${ORIGIN}/schemas/litepub-0.1.jsonld`;
+
+  it("fetches each page once and resolves a remote @context through the context loader", async () => {
+    // Akkoma and Pleroma pages name their own @context; Fedify's caching loader must serve it,
+    // or every page costs one extra request past the host limiter.
+    const urls = [1, 2, 3].map((index) => `${OUTBOX}?page=${index}`);
+    const docs: Record<string, unknown> = { [OUTBOX]: root(`${OUTBOX}?page=1`) };
+    urls.forEach((url, index) => {
+      docs[url] = {
+        ...page(
+          url,
+          [create(String(index), `2026-09-0${index + 1}T10:00:00Z`)],
+          urls[index + 1],
+        ),
+        "@context": [AS, LITEPUB],
+      };
+    });
+    const { load, calls } = loaderOf(docs);
+    const contexts: string[] = [];
+    const counting: DocumentLoader = async (url, options) => {
+      contexts.push(url);
+      if (url === LITEPUB)
+        return { contextUrl: null, documentUrl: url, document: { "@context": {} } };
+      return contextLoader(url, options);
+    };
+    const { outbox, loader } = await openOutbox(actor(), {
+      unsigned: load,
+      signed: load,
+      contextLoader: counting,
+    });
+    const progress: WalkProgress = {
+      partial: false,
+      pages: 0,
+      itemsSeen: 0,
+      itemsSkipped: 0,
+      dereferenced: 0,
+    };
+    const posts: Post[] = [];
+    for await (const post of walkOutbox(actor(), outbox, loader, counting, progress, NOW))
+      posts.push(post);
+
+    assert.equal(posts.length, 3);
+    assert.equal(progress.partial, false);
+    assert.deepEqual(calls, [OUTBOX, ...urls], "every page exactly once, nothing else");
+    assert.ok(
+      contexts.includes(LITEPUB),
+      "the litepub context goes through the context loader",
+    );
+  });
+
+  it("keeps what was read when a next link answers with something that is not a page", async () => {
+    const p1 = `${OUTBOX}?page=1`;
+    const p2 = `${OUTBOX}?page=2`;
+    const { posts, progress } = await collect({
+      [OUTBOX]: root(p1),
+      [p1]: page(p1, [create("1", "2026-09-01T10:00:00Z")], p2),
+      [p2]: { "@context": AS, id: p2, type: "OrderedCollection", orderedItems: [] },
+    });
+    assert.equal(posts.length, 1);
+    assert.equal(progress.partial, true);
+  });
+
+  it("refuses a next page redirected to another origin that claims the actor's", async () => {
+    // Fedify's getNext() rule: the page's id must share the origin it was served from.
+    const p1 = `${OUTBOX}?page=1`;
+    const p2 = `${OUTBOX}?page=2`;
+    const { load } = loaderOf({
+      [OUTBOX]: root(p1),
+      [p1]: page(p1, [create("1", "2026-09-01T10:00:00Z")], p2),
+      [p2]: page(p2, [create("2", "2026-08-01T10:00:00Z")]),
+    });
+    const redirected: DocumentLoader = async (url, options) => {
+      const doc = await load(url, options);
+      return url === p2 ? { ...doc, documentUrl: "https://evil.test/p" } : doc;
+    };
+    const { outbox, loader } = await openOutbox(actor(), {
+      unsigned: redirected,
+      signed: redirected,
+      contextLoader,
+    });
+    const progress: WalkProgress = {
+      partial: false,
+      pages: 0,
+      itemsSeen: 0,
+      itemsSkipped: 0,
+      dereferenced: 0,
+    };
+    const posts: Post[] = [];
+    for await (const post of walkOutbox(actor(), outbox, loader, contextLoader, progress, NOW))
+      posts.push(post);
+    assert.equal(posts.length, 1, "nothing from the redirected page");
+    assert.equal(progress.partial, true);
+  });
+
+  it("calls a non-page unreadable when nothing was read before it", async () => {
+    const p1 = `${OUTBOX}?page=1`;
+    const p2 = `${OUTBOX}?page=2`;
+    await assert.rejects(
+      collect({
+        [OUTBOX]: root(p1),
+        [p1]: page(p1, [], p2),
+        [p2]: { "@context": AS, id: p2, type: "Note", content: "not a page" },
+      }),
+      (error: unknown) => error instanceof OutboxError && error.kind === "outboxUnreadable",
+    );
   });
 });
 
@@ -334,6 +464,7 @@ describe("servers that answer with the wrong shape", () => {
     const { outbox, loader } = await openOutbox(actor(), {
       unsigned: unsigned.load,
       signed: signed.load,
+      contextLoader,
     });
     assert.ok(await routesThrough(loader, signed), "must fall through to the signed loader");
     const progress: WalkProgress = {
@@ -344,7 +475,7 @@ describe("servers that answer with the wrong shape", () => {
       dereferenced: 0,
     };
     const posts: Post[] = [];
-    for await (const post of walkOutbox(actor(), outbox, loader, progress, NOW))
+    for await (const post of walkOutbox(actor(), outbox, loader, contextLoader, progress, NOW))
       posts.push(post);
     assert.equal(posts.length, 1);
   });
@@ -358,7 +489,7 @@ describe("servers that answer with the wrong shape", () => {
       [p1]: { "@context": AS, id: p1, type: "OrderedCollection", orderedItems: [] },
     });
     await assert.rejects(
-      () => openOutbox(actor(), { unsigned: load, signed: load }),
+      () => openOutbox(actor(), { unsigned: load, signed: load, contextLoader }),
       (error: unknown) =>
         error instanceof OutboxError &&
         error.kind === "outboxUnreadable" &&
@@ -705,7 +836,11 @@ describe("authorized fetch", () => {
       error.response = new Response("", { status: 401 });
       throw error;
     };
-    const { outbox, loader } = await openOutbox(actor(), { unsigned, signed: signed.load });
+    const { outbox, loader } = await openOutbox(actor(), {
+      unsigned,
+      signed: signed.load,
+      contextLoader,
+    });
     assert.ok(
       await routesThrough(loader, signed),
       "the signed loader must be used for the rest of the walk",
@@ -731,7 +866,11 @@ describe("authorized fetch", () => {
       documentUrl: OUTBOX,
       document: { "@context": AS, id: OUTBOX, type: "Note" },
     });
-    const { loader } = await openOutbox(nullish, { unsigned, signed: signed.load });
+    const { loader } = await openOutbox(nullish, {
+      unsigned,
+      signed: signed.load,
+      contextLoader,
+    });
     assert.ok(
       await routesThrough(loader, signed),
       "a null unsigned result must fall through to signed",
@@ -746,7 +885,7 @@ describe("authorized fetch", () => {
       throw error;
     };
     await assert.rejects(
-      () => openOutbox(actor(), { unsigned, signed: signed.load }),
+      () => openOutbox(actor(), { unsigned, signed: signed.load, contextLoader }),
       (error: unknown) => error instanceof OutboxError && error.kind === "outboxGone",
     );
     assert.deepEqual(signed.calls, [], "a missing outbox is not an authorization problem");

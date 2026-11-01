@@ -121,6 +121,9 @@ async function makeLoaders(deps: WorkerDeps, session: Session<void>, bot: string
       await session.context.getDocumentLoader({ identifier: bot }),
       deps.limiter,
     ),
+    // Fedify's caching loader; the default one would refetch a remote @context on every
+    // page, past the host limiter.
+    contextLoader: session.context.contextLoader,
   } satisfies Loaders;
 }
 
@@ -165,7 +168,10 @@ async function runJob(deps: WorkerDeps, job: Job): Promise<void> {
     };
 
     const counted = await computeStats(
-      plausibleOnly(walkOutbox(actor, outbox, loader, progress, now), now),
+      plausibleOnly(
+        walkOutbox(actor, outbox, loader, loaders.contextLoader, progress, now),
+        now,
+      ),
       account,
       {
         from: new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000),

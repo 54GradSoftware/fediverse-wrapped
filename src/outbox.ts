@@ -7,7 +7,7 @@ import {
   Article,
   Object as ASObject,
   type Collection,
-  type CollectionPage,
+  CollectionPage,
   Create,
   Document,
   Hashtag,
@@ -169,6 +169,8 @@ export type Loaders = {
   readonly unsigned: DocumentLoader;
   /** Used only after a 401/403; GoToSocial and secure-mode instances need it. */
   readonly signed: DocumentLoader;
+  /** For JSON-LD @context documents; Fedify's caches them (Akkoma, Pleroma: litepub). */
+  readonly contextLoader: DocumentLoader;
 };
 
 export type WalkProgress = {
@@ -244,16 +246,17 @@ export async function openOutbox(
 
   const unsigned = identified(loaders.unsigned);
   const signed = identified(loaders.signed);
+  const { contextLoader } = loaders;
   // Root AND first page must load with the chosen loader: Akkoma 3.20 serves the root
   // unsigned but answers an unsigned `?page=true` with an empty non-page.
   const attempt = async (loader: DocumentLoader) => {
-    const outbox = await actor.getOutbox({ documentLoader: loader });
+    const outbox = await actor.getOutbox({ documentLoader: loader, contextLoader });
     if (outbox == null) return null;
     // An off-origin first page is left unfetched; walkOutbox refuses it.
     if (outbox.firstId != null && sameOriginHttps(outbox.firstId, origin)) {
       // Only the shape is validated. Fedify memoises the page on the collection and the walk
       // reuses it, which is why the loaders are wrapped here.
-      await outbox.getFirst({ documentLoader: loader });
+      await outbox.getFirst({ documentLoader: loader, contextLoader });
     }
     return outbox;
   };
@@ -293,6 +296,7 @@ export async function* walkOutbox(
   actor: Actor,
   outbox: Collection,
   loader: DocumentLoader,
+  contextLoader: DocumentLoader,
   progress: WalkProgress,
   now: Date,
 ): AsyncGenerator<Post> {
@@ -306,7 +310,7 @@ export async function* walkOutbox(
   /** Posts handed out so far; a page failure after the first one is survivable. */
   let yielded = 0;
 
-  const opts = { documentLoader: loader };
+  const opts = { documentLoader: loader, contextLoader };
 
   // Fetches a Create's referenced object: same-origin https only, within MAX_DEREFERENCES.
   const dereference = async (id: URL): Promise<ASObject | null> => {
@@ -424,7 +428,7 @@ export async function* walkOutbox(
     }
 
     // Validate the NEXT link before following it. Checking the page after
-    // getNext() would mean the cross-origin request had already been sent.
+    // the fetch would mean the cross-origin request had already been sent.
     const nextId = page.nextId;
     if (nextId == null) return;
     if (!sameOriginHttps(nextId, origin) || seenPages.has(nextId.href)) {
@@ -432,7 +436,7 @@ export async function* walkOutbox(
       return;
     }
     try {
-      page = await page.getNext(opts);
+      page = await fetchPage(nextId, loader, contextLoader);
     } catch (error) {
       // A timeout or 429 deep into a busy year: keep what was read rather than
       // throw it away and re-walk every page against the same rate limit.
@@ -443,6 +447,29 @@ export async function* walkOutbox(
       throw classifyFetchError(error, "outbox next page failed");
     }
   }
+}
+
+// Not page.getNext(): Fedify memoises each fetched page on the one before, so a 150 page
+// walk keeps every page (and its raw JSON) reachable until the job ends. That ran a
+// 384 MB heap out of memory. Fetched standalone, a read page can be collected.
+async function fetchPage(
+  id: URL,
+  loader: DocumentLoader,
+  contextLoader: DocumentLoader,
+): Promise<CollectionPage> {
+  const doc = await loader(id.href);
+  const servedFrom = new URL(doc.documentUrl);
+  const page = await CollectionPage.fromJsonLd(doc.document, {
+    documentLoader: loader,
+    contextLoader,
+    baseUrl: servedFrom,
+  });
+  // getNext()'s own rules: a page only speaks for the origin that served it, so a redirect
+  // cannot claim the actor's origin in its id. Thrown as a TypeError, i.e. outboxUnreadable.
+  if (!(page instanceof CollectionPage) || page.id?.origin !== servedFrom.origin) {
+    throw new TypeError(`not a page served by its own origin: ${id.href}`);
+  }
+  return page;
 }
 
 /** An outbox may not hand its pagination to another origin, or to plain http. */

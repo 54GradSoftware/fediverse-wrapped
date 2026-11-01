@@ -54,11 +54,12 @@ export function buildInstance(db: DatabaseSync, { consumeQueues = true } = {}) {
   const delivery = queue(db, "fedify_outbox", cfg.deliveryConcurrency, consumeQueues);
   const inbox = queue(db, "fedify_inbox", cfg.inboxConcurrency, consumeQueues);
 
+  // Own file: SqliteRepository's connection has busy_timeout 0, so sharing app.db
+  // would make any write contention throw out of session.publish().
+  const repository = new SqliteRepository({ path: cfg.botDbPath });
   const instance = createInstance<void>({
     kv: new SqliteKvStore(db, { tableName: "fedify_kv" }),
-    // Own file: SqliteRepository's connection has busy_timeout 0, so sharing app.db
-    // would make any write contention throw out of session.publish().
-    repository: new SqliteRepository({ path: cfg.botDbPath }),
+    repository,
     // Split so a fan-out never queues ahead of mentions. BotKit types a single queue
     // but passes it to Fedify untouched, which accepts the split form.
     queue: {
@@ -112,5 +113,6 @@ export function buildInstance(db: DatabaseSync, { consumeQueues = true } = {}) {
     };
   });
 
-  return { instance, bots };
+  // The repository is returned for `node ace resend`, which reads what the bots published.
+  return { instance, bots, repository };
 }

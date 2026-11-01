@@ -187,6 +187,112 @@ describe("jobs", () => {
   });
 });
 
+describe("resending crashed jobs", () => {
+  const ACTOR = "https://x.test/users/a";
+  const TODAY = "2026-11-01";
+
+  /** A job that crashed on its third attempt, the way the out-of-memory loop left them. */
+  async function crashed(db: Db, over: Partial<Parameters<Db["insertJob"]>[0]> = {}) {
+    await db.insertJob(job(over));
+    const claimed = (await db.claimJob(NOW))!;
+    await db.finishJob(claimed.message_id, "failed", "crashed", 50);
+    return claimed.message_id;
+  }
+
+  it("lists only jobs that crashed without any reply", async () => {
+    const db = await fresh();
+    const lost = await crashed(db);
+    await db.insertJob(job({ messageId: "https://y.test/2", host: "y.test" }));
+    const done = (await db.claimJob(NOW))!;
+    await db.finishJob(done.message_id, "done", "ok", 60, "https://bot.test/note/1");
+    await db.insertJob(job({ messageId: "https://z.test/3", host: "z.test" }));
+    const refused = (await db.claimJob(NOW))!;
+    await db.finishJob(refused.message_id, "failed", "outboxGone", 60);
+
+    assert.deepEqual(
+      (await db.unansweredJobs()).map((row) => row.message_id),
+      [lost],
+    );
+  });
+
+  it("puts a crashed job back in the queue once, with fresh attempts and its actor", async () => {
+    const db = await fresh();
+    const lost = await crashed(db);
+    assert.equal(await db.reopenJob(lost, ACTOR, 70, TODAY), true);
+    assert.equal(
+      await db.reopenJob(lost, ACTOR, 70, TODAY),
+      false,
+      "a second run changes nothing",
+    );
+
+    const claimed = await db.claimJob(NOW);
+    assert.equal(claimed?.message_id, lost);
+    assert.equal(claimed?.attempts, 1);
+    assert.equal(claimed?.actor_id, ACTOR);
+    assert.equal(claimed?.created_at, 70, "counted as mentioned today");
+    assert.deepEqual(await db.unansweredJobs(), []);
+  });
+
+  it("claims today, so a new mention while it waits is refused instead of queued", async () => {
+    const db = await fresh();
+    const lost = await crashed(db);
+    await db.reopenJob(lost, ACTOR, 70, TODAY);
+    assert.equal(
+      await db.acceptJob(job({ messageId: "https://x.test/2", now: 80 }), TODAY),
+      "overLimit",
+    );
+  });
+
+  it("reopens a job that crashed today, whose claim on the day already exists", async () => {
+    const db = await fresh();
+    await db.acceptJob(job(), TODAY);
+    const claimed = (await db.claimJob(NOW))!;
+    await db.finishJob(claimed.message_id, "failed", "crashed", 50);
+    assert.equal(await db.reopenJob(claimed.message_id, ACTOR, 70, TODAY), true);
+  });
+
+  it("refuses to reopen with an actor that does not match the stored hash", async () => {
+    const db = await fresh();
+    const lost = await crashed(db);
+    assert.equal(
+      await db.reopenJob(lost, "https://x.test/users/someone-else", 70, TODAY),
+      false,
+    );
+    assert.equal(await db.claimJob(NOW), null);
+    assert.equal(await db.claimReply(db.hashActor(ACTOR), TODAY, "wrapped", 80), true);
+  });
+
+  it("never reopens a job that was answered", async () => {
+    const db = await fresh();
+    await db.insertJob(job());
+    const claimed = (await db.claimJob(NOW))!;
+    await db.finishJob(claimed.message_id, "done", "ok", 50, "https://bot.test/note/1");
+    assert.equal(await db.reopenJob(claimed.message_id, ACTOR, 70, TODAY), false);
+  });
+
+  it("counts every later mention as covering an older one, except a refusal", async () => {
+    const db = await fresh();
+    const hash = db.hashActor(ACTOR);
+    await crashed(db);
+    assert.equal(await db.hasLaterMention(hash, 1_000), false);
+
+    await db.acceptJob(job({ messageId: "https://x.test/2", now: 2_000 }), TODAY);
+    await db.acceptJob(job({ messageId: "https://x.test/3", now: 3_000 }), TODAY);
+    assert.equal(await db.hasLaterMention(hash, 1_000), true, "the queued one counts");
+    assert.equal(await db.hasLaterMention(hash, 2_000), false, "the refused one does not");
+
+    // Crashed as well, or answered with a failure reply: either way the newer one wins.
+    await db.claimJob(NOW);
+    await db.finishJob("https://x.test/2", "failed", "outboxGone", 4_000);
+    assert.equal(await db.hasLaterMention(hash, 1_000), true, "a failure reply counts");
+    await db.query
+      .from("jobs")
+      .where("message_id", "https://x.test/2")
+      .update({ outcome: "crashed" });
+    assert.equal(await db.hasLaterMention(hash, 1_000), true, "a newer crash counts");
+  });
+});
+
 describe("accepting a mention", () => {
   const day = "2026-09-18";
 
