@@ -135,6 +135,48 @@ describe("origin pinning", () => {
   });
 });
 
+describe("browser on an ActivityPub URI", () => {
+  // What Fedify answers when the Accept header asks for HTML rather than JSON-LD.
+  const negotiated = createFetchHandler(
+    db,
+    async () => new Response("Not Acceptable", { status: 406 }),
+  );
+  const fetchUri = (path: string, method = "GET") =>
+    negotiated(new Request(`https://${HOST}${path}`, { method }));
+  const note = "01a19bc5-ebdb-768f-b860-d38bbb671060";
+
+  it("is sent to the post's page instead of a bare 406", async () => {
+    for (const method of ["GET", "HEAD"]) {
+      const response = await fetchUri(`/ap/actor/fediwrapped_de/note/${note}`, method);
+      assert.equal(response.status, 302);
+      assert.equal(response.headers.get("location"), `${cfg.origin}/@fediwrapped_de/${note}`);
+    }
+  });
+
+  it("is sent to the bot's profile from the actor URI", async () => {
+    const response = await fetchUri("/ap/actor/fediwrapped_en");
+    assert.equal(response.status, 302);
+    assert.equal(response.headers.get("location"), `${cfg.origin}/@fediwrapped_en`);
+  });
+
+  it("keeps the 406 for URIs that have no page", async () => {
+    for (const path of [
+      `/ap/actor/fediwrapped_de/create/${note}`,
+      "/ap/actor/fediwrapped_de/outbox",
+    ]) {
+      assert.equal((await fetchUri(path)).status, 406, path);
+    }
+  });
+
+  it("leaves a fediverse server's JSON fetch untouched", async () => {
+    const response = await get(`/ap/actor/fediwrapped_de/note/${note}`, {
+      "x-forwarded-host": HOST,
+      accept: "application/activity+json",
+    });
+    assert.equal(await response.text(), "federation");
+  });
+});
+
 describe("source route", () => {
   it("redirects to the repository, satisfying AGPL section 13", async () => {
     const response = await get("/source", { "x-forwarded-host": HOST });

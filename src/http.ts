@@ -14,6 +14,8 @@ const logger = getLogger(["wrapped", "http"]);
 /** Lower-case hex only, exact group lengths: no traversal. */
 const IMAGE_PATH = /^\/i\/([0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})\.png$/;
 
+const AP_URI = /^\/ap\/actor\/([^/]+)(?:\/note(\/[^/]+))?$/;
+
 const CANONICAL = new URL(cfg.origin);
 
 // Pins the request URL to ORIGIN: BotKit derives every URI from it, and a proxy without
@@ -117,6 +119,12 @@ export function createFetchHandler(
     }
 
     const response = await federationFetch(await canonicalise(request));
+    // Fedify gives a browser a bare 406 on an actor or note URI, which some apps link
+    // instead of the page. Non-public posts have no page, so they stay hidden.
+    const apUri = AP_URI.exec(url.pathname);
+    if (response.status === 406 && apUri != null) {
+      return Response.redirect(`${cfg.origin}/@${apUri[1]}${apUri[2] ?? ""}`, 302);
+    }
     return await rewritePage(response, url.pathname, request.method);
   };
 }
