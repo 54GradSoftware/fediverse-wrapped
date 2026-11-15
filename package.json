@@ -35,7 +35,7 @@
     "@formatjs/icu-messageformat-parser": "^3.5.22",
     "@logtape/logtape": "^2.4.2",
     "@resvg/resvg-js": "^2.6.2",
-    "better-sqlite3": "^13.0.3",
+    "better-sqlite3": "^13.1.1",
     "html-entities": "^2.6.0",
     "intl-messageformat": "^12.1.4",
     "luxon": "^3.7.2",
