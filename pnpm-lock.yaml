@@ -9,38 +9,38 @@ importers:
   .:
     dependencies:
       '@adonisjs/ace':
-        specifier: ^14.1.1
-        version: 14.1.1(youch@4.1.1)
+        specifier: ^14.1.2
+        version: 14.1.2(youch@4.1.1)
       '@adonisjs/core':
-        specifier: ^7.6.0
-        version: 7.6.0(supports-color@10.2.2)(youch@4.1.1)
+        specifier: ^7.7.0
+        version: 7.7.0(supports-color@10.2.2)(youch@4.1.1)
       '@adonisjs/env':
-        specifier: ^7.1.0
-        version: 7.1.0
+        specifier: ^7.1.1
+        version: 7.1.1
       '@adonisjs/lucid':
-        specifier: ^22.4.2
-        version: 22.4.2(@adonisjs/core@7.6.0(supports-color@10.2.2)(youch@4.1.1))(better-sqlite3@13.0.3)(luxon@3.7.2)(supports-color@10.2.2)
+        specifier: ^22.5.0
+        version: 22.5.0(@adonisjs/core@7.7.0(supports-color@10.2.2)(youch@4.1.1))(better-sqlite3@13.2.0)(luxon@3.7.2)(supports-color@10.2.2)
       '@fedify/botkit':
-        specifier: 0.5.8
-        version: 0.5.8
+        specifier: 0.5.9
+        version: 0.5.9
       '@fedify/botkit-sqlite':
-        specifier: 0.5.8
-        version: 0.5.8(@fedify/botkit@0.5.8)
+        specifier: 0.5.9
+        version: 0.5.9(@fedify/botkit@0.5.9)
       '@fedify/fedify':
-        specifier: ~2.3.15
-        version: 2.3.15
+        specifier: ~2.3.16
+        version: 2.3.16
       '@fedify/sqlite':
-        specifier: ~2.3.15
-        version: 2.3.15(@fedify/fedify@2.3.15)
+        specifier: ~2.3.16
+        version: 2.3.16(@fedify/fedify@2.3.16)
       '@fedify/vocab':
-        specifier: ~2.3.15
-        version: 2.3.15
+        specifier: ~2.3.16
+        version: 2.3.16
       '@fedify/vocab-runtime':
-        specifier: ~2.3.15
-        version: 2.3.15
+        specifier: ~2.3.16
+        version: 2.3.16
       '@formatjs/icu-messageformat-parser':
-        specifier: ^3.5.22
-        version: 3.5.22
+        specifier: ^3.5.23
+        version: 3.5.23
       '@logtape/logtape':
         specifier: ^2.4.2
         version: 2.4.2
@@ -48,14 +48,14 @@ importers:
         specifier: ^2.6.2
         version: 2.6.2
       better-sqlite3:
-        specifier: ^13.0.3
-        version: 13.0.3
+        specifier: ^13.2.0
+        version: 13.2.0
       html-entities:
         specifier: ^2.6.0
         version: 2.6.0
       intl-messageformat:
-        specifier: ^12.1.4
-        version: 12.1.4
+        specifier: ^12.2.0
+        version: 12.2.0
       luxon:
         specifier: ^3.7.2
         version: 3.7.2
@@ -64,8 +64,8 @@ importers:
         version: 1.0.8
     devDependencies:
       '@biomejs/biome':
-        specifier: ^2.6.4
-        version: 2.6.4
+        specifier: ^2.6.8
+        version: 2.6.8
       '@types/node':
         specifier: ^26.6.6
         version: 26.6.6
@@ -77,6 +77,12 @@ packages:
 
   '@adonisjs/ace@14.1.1':
     resolution: {integrity: sha512-6MP2eZicAP8hd1US1PR2b6hEzWVaNlEbbAxanwDAyTOMW8PysefQam7b59ipbxw4+ADTJsgIyQWVt815W9f6WQ==}
+    engines: {node: '>=24.0.0'}
+    peerDependencies:
+      youch: ^4.1.0-beta.11 || ^4.1.0
+
+  '@adonisjs/ace@14.1.2':
+    resolution: {integrity: sha512-//n39wyNzxLwOP87M1zqdlEonb/AGYCqUmNhLQLOmYQ45AlkUUL7vblR1jTuTppN4L4KLdKpcXAoHNIYYTzSMg==}
     engines: {node: '>=24.0.0'}
     peerDependencies:
       youch: ^4.1.0-beta.11 || ^4.1.0
@@ -102,12 +108,12 @@ packages:
     resolution: {integrity: sha512-YVDRL8xHCtM6iMnAefOBaz6iXVpojwBPDQWPKxnVSucycYeNGrGitJiLy+cGaeAU7Gjm8al9SJRJt3rRPr5PKg==}
     engines: {node: '>=24.0.0'}
 
-  '@adonisjs/core@7.6.0':
-    resolution: {integrity: sha512-DGDkpoNrExwLhhmuzZBaOKe6wk67HI/0+3GLWsJXB+Ze4NjXuKKOT5169R2CqpSO6yvL1Xw39HwSJ9YJ1oTvLg==}
+  '@adonisjs/core@7.7.0':
+    resolution: {integrity: sha512-QlN8trMRvatDFIZNvUAVrG59utouX4dSYVB2RkX4vfyKcu5ozwwooKtIulGptoXRFu1ZWw4mfIgjs7xc/OvU6A==}
     engines: {node: '>=24.0.0'}
     hasBin: true
     peerDependencies:
-      '@adonisjs/assembler': ^8.0.0-next.23 || ^8.0.0
+      '@adonisjs/assembler': ^8.6.0
       '@vinejs/vine': ^4.0.0
       argon2: ^0.44.0 || ^0.45.1
       bcrypt: ^6.0.0
@@ -132,6 +138,10 @@ packages:
 
   '@adonisjs/env@7.1.0':
     resolution: {integrity: sha512-DXKCDIDoHzjxx9O7HvFYYBGQENmF5ANTUXBGE65ygOcJTtXyrLBISUkjrIQGVAKUmcLPF9WInkXQfxMnfO2VJw==}
+    engines: {node: '>=24.0.0'}
+
+  '@adonisjs/env@7.1.1':
+    resolution: {integrity: sha512-s+5HMhiKCTHort+i00DZXlwqT4JK6eS0Oj7TBNHQhH2DWxSkB0WIiurKVbwNiIHZan6BaEiabStNbkUlBp5CVw==}
     engines: {node: '>=24.0.0'}
 
   '@adonisjs/events@10.2.0':
@@ -190,8 +200,8 @@ packages:
       pino-pretty:
         optional: true
 
-  '@adonisjs/lucid@22.4.2':
-    resolution: {integrity: sha512-3ztENqBQIFSGAWREHKCGbL1g4ehtsxxsuFX72Uf5bq+oSc0D6UcumjzYpU8TPyBxhmgS6HuRSfz2rG42iuz7AA==}
+  '@adonisjs/lucid@22.5.0':
+    resolution: {integrity: sha512-Lf8L4NihhK+VhIyKt/p/5U+W474ZC0DCzAkSullGeR+yP/41fuUOW51SJTlGYkBRQQ8Sc+YNkdD7hm0CXkz6Kg==}
     engines: {node: '>=24.0.0'}
     peerDependencies:
       '@adonisjs/assembler': ^8.0.0-next.29 || ^8.0.0
@@ -224,71 +234,71 @@ packages:
     resolution: {integrity: sha512-UQFQ6SgyJ6LX42W8rHCs8KVc0JS0tzVL9ct4XYedJukskYVWTo49tNiMEK9C2HTyarbNiT/RVIRSY82vH+6sTg==}
     engines: {node: '>=4'}
 
-  '@biomejs/biome@2.6.4':
-    resolution: {integrity: sha512-8sKKwaNW4ot22awZ3lBjwWLHnUFXgXnrBPYS2gNlBAXRbDC++7kqjK2H7dR/FgCDtPvO1xfKpgEhJkGxAKYkxA==}
+  '@biomejs/biome@2.6.8':
+    resolution: {integrity: sha512-kqZUFvX6/aYQOmzfRN5ANcfNS9wLH4aHLWWP/dQKyhRZVoA6rdWszA7DGugFcxPbMiznUyVYyukVl+ExZN4PQA==}
     engines: {node: '>=14.21.3'}
     hasBin: true
 
-  '@biomejs/cli-android-arm64@2.6.4':
-    resolution: {integrity: sha512-jwrwigP4tBcHxzuV8izioX/BOUhJL/4e2rNSOE5nCjBkVC018LQAQUGiH+CNkFYvLtQ1dcZo5/xXERmaAGc7JQ==}
+  '@biomejs/cli-android-arm64@2.6.8':
+    resolution: {integrity: sha512-X4JKPLK85kfUTwuuaORFplnBfGjKkp62PsFhhcL7F/Tpltc7pyUofjlkkMnlZZLWsifFl7LNB8ngVrwJg1uo1Q==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [android]
 
-  '@biomejs/cli-android-x64@2.6.4':
-    resolution: {integrity: sha512-HdGInPJ4nZFwHxzvEtcp2nmSBtUyJrurmtIK43upFckuS3+ZqVM05HtsxQWnqGsuy/pxckIAjyKWlEKRlBXUyA==}
+  '@biomejs/cli-android-x64@2.6.8':
+    resolution: {integrity: sha512-C3Hk485vl+deEj53K08+SYYelPIPkdSZL3qHuD31Xi+qydVa4q2ze+aCYo1k3iJGWtvWtjHaGkDh7S2sX6wk8w==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [android]
 
-  '@biomejs/cli-darwin-arm64@2.6.4':
-    resolution: {integrity: sha512-0VvcUz46wbg59Q4TZ59KkIjDJrxEyu4Eoe79+F4SChxoWe+W7AEyIp6F5r72C9+p6MsB6dIovnZt1D30lGM3XA==}
+  '@biomejs/cli-darwin-arm64@2.6.8':
+    resolution: {integrity: sha512-DHyj+JnRHcn4YdvpiqgTFZMYKSPELMCfFpNNlEuu1L8DKTGXhzW7raIwdsbo2Ie9nCljQLAQkVWQk/mwM0ueiA==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [darwin]
 
-  '@biomejs/cli-darwin-x64@2.6.4':
-    resolution: {integrity: sha512-fxmvkF81srlS3DiMyfm+aG3J0eG+6/BjaxRyjy57KbLSafnq0PO+hHfVWmtH2ty0S7nm6yDXBRwySfFeaRJKRQ==}
+  '@biomejs/cli-darwin-x64@2.6.8':
+    resolution: {integrity: sha512-QWWUPjlA0RnkkgYnFLUHZu+RrDc0FdK0A+wEPA+dENQJwsuSHMH89lspnAw2QUWWc9VHyfluGx1Xmp6Y2GZi8Q==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [darwin]
 
-  '@biomejs/cli-linux-arm64-musl@2.6.4':
-    resolution: {integrity: sha512-31ZaH/MHqPX+O+evRwRrCHQ8W5/9adY+/eMytGGWZnRx1T41QsWIF09+/WujynLBhWZUxNGS5CtsWLwgOFTAyg==}
+  '@biomejs/cli-linux-arm64-musl@2.6.8':
+    resolution: {integrity: sha512-WB9PhOitX+bRc0G3+GNJGlvbKoWn3JoB9z4E04JQizIC9aPCQyIvwvWG7QZHxw6k20Fi+dHLmZ2fSEmBa9HqiA==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@biomejs/cli-linux-arm64@2.6.4':
-    resolution: {integrity: sha512-6+bK1Y/evmIUiJr7auertuMbiaYVicJhqA1bZyL47lCMWugv8l0gFQCqvR/gN1vZMHYm+HwoTKgeMxdNFCoQTg==}
+  '@biomejs/cli-linux-arm64@2.6.8':
+    resolution: {integrity: sha512-0Bjim8lKwnrvXUHoI4k3Tb51BjoiLEwDnovCI8nSzkk6wj3dShiuAjrx6+X0Hjf4ejR1sRZgTQiSDHlpy9vB7w==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@biomejs/cli-linux-x64-musl@2.6.4':
-    resolution: {integrity: sha512-bomSa2XdQAGGj6Cwdm4M13qE+lN9+AOlW8KtI4hdyVyRRF/Z71qPAi95T4wtdZK0QpBbkTW8hgbZZCwPi4xzIw==}
+  '@biomejs/cli-linux-x64-musl@2.6.8':
+    resolution: {integrity: sha512-64Yzo+J4fEk7Kf9SMnVdVxC+Y2A2e/L86QTP9JjGQ57lsddyELLpbBcNMxSJggre2T1AvISwwSrOApkBAHDqNA==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@biomejs/cli-linux-x64@2.6.4':
-    resolution: {integrity: sha512-tbFZMdL6dP/ws4edXxYG9WhvaVa1ZDzL4G5DzahnWW7Psib9H+VTdyU4XXVxpJk5j/nYZroSbvSNyYlpW3yCIw==}
+  '@biomejs/cli-linux-x64@2.6.8':
+    resolution: {integrity: sha512-XIk3pLQT56I6Tti+u0DF8FtSNXjCMTPbxVTzfJ9cS2t1ImVKvrqV5b52GuEaJg6/wuiXvz0sjfb5saB4TPRjzA==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@biomejs/cli-win32-arm64@2.6.4':
-    resolution: {integrity: sha512-eCsqt8Ma3eVap+oyJCDnJZH60SIU464B66n3y38EUTJdM1T/HfZol1FJC9vb+sHToX0ix8XzqPcwJnOzyAJz0g==}
+  '@biomejs/cli-win32-arm64@2.6.8':
+    resolution: {integrity: sha512-ezjCEZzHIWE2pdh83a7zLVcAAcDaERcTcvfA7uWlxqz/1CuDxgtfO19pDg9B6YY4wKYIDvYBw2QCMnqIshSwmw==}
     engines: {node: '>=14.21.3'}
     cpu: [arm64]
     os: [win32]
 
-  '@biomejs/cli-win32-x64@2.6.4':
-    resolution: {integrity: sha512-pYsMy5AThiHFOZAsngg8qN4PurM6nInKBhVX7sbj3eNpRQqo1Hb0MgCwPL7VqVMrmcEEMj9Ks3qbkallR65e8g==}
+  '@biomejs/cli-win32-x64@2.6.8':
+    resolution: {integrity: sha512-cD6HvGczZUiAYsY8s2TxxXj2AHFzEdMomvVJfEjzOjBM45nGqIDfBpbtvwGQzDCN8X2yKKk9u1jnDZisT2nxIg==}
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [win32]
@@ -319,18 +329,18 @@ packages:
     resolution: {integrity: sha512-3RQHgEtvL1Frl/d1cSreo7qhJ3Gk1OdNUai/CtZ8G+wYeRQnJih3s9xJ9/kgYekPQRdwgh0HXRPqMlzWGwivIQ==}
     engines: {node: ^20.19.0 || ^22.13.0 || ^23.5.0 || >=24.0.0, npm: '>=10'}
 
-  '@fedify/botkit-sqlite@0.5.8':
-    resolution: {integrity: sha512-OJ1LB/CHnbtrgsTwqUiJkl+ZSZEKq/4TZqsB65gQyHTvgP+D9mufDPKZ85vc6p3SC5d6KfGdeNcNZVYntJ4U4g==}
+  '@fedify/botkit-sqlite@0.5.9':
+    resolution: {integrity: sha512-+MVc9CmaJpLejz1ys+7M7r93vuwu0S5uQrciNPXkRwwvfZ7IAlU9d9WRh4O1eO3liyGkspQRO/2V4VGPQb+CBA==}
     engines: {deno: '>=2.0.0', node: '>=22.0.0'}
     peerDependencies:
-      '@fedify/botkit': ^0.5.8
+      '@fedify/botkit': ^0.5.9
 
-  '@fedify/botkit@0.5.8':
-    resolution: {integrity: sha512-CkfbopY/6bKrvozuvNNosriryiUp5R8uNvUHUinrZ3pTs7CnZSDM9NKL0dz4kLG3RVF6/68A0m9De2NAmTc+MA==}
+  '@fedify/botkit@0.5.9':
+    resolution: {integrity: sha512-dwClU1K1blVaUbKN1o99NS78NkF9nbxumTbGpPcP8jv7dwdt6eQ6I3SLce6IWIWQp+s+xladwatYe86dAS6Ouw==}
     engines: {bun: '>=1.1.0', deno: '>=2.0.0', node: '>=22.0.0'}
 
-  '@fedify/fedify@2.3.15':
-    resolution: {integrity: sha512-KyHHgv3hqNfo1PAN/GSP4lw4e5ig3MYiOIXa4XfpVEpVrnaPObMq5Y1vR0GUEEO66LIbrHpeQ2teamhcwxmVJw==}
+  '@fedify/fedify@2.3.16':
+    resolution: {integrity: sha512-7VN5Cmtt7/soVe9aYmO3b7CXYq4GZNDuPVENmMdP3ojheOnnZr8TO+KU7NOd+QPgbPUXHGZE/MJxt8k4pAWv9w==}
     engines: {bun: '>=1.1.0', deno: '>=2.0.0', node: '>=22.0.0'}
 
   '@fedify/markdown-it-hashtag@0.3.0':
@@ -339,39 +349,39 @@ packages:
   '@fedify/markdown-it-mention@0.3.0':
     resolution: {integrity: sha512-4uVELsxh9AW0hzC6BVFqN59YWj6M/p6AZpwb/CQDjvcinfHyQp2yYtGDV4fBgsE5WC/ukpvU1pBNH20ts8TK4w==}
 
-  '@fedify/sqlite@2.3.15':
-    resolution: {integrity: sha512-KPG2hSIKJdof0NYbmGlF9nMsC/wH4KrQ4l6dq6OlSUG+QSMyWFZMptHkW5cpc60fqZmC24ZNC0Vvf/+7F4lYmA==}
+  '@fedify/sqlite@2.3.16':
+    resolution: {integrity: sha512-rAciDBb+xBJ4q0pjYJqvmWv42drKPyLlL/OxqJKgQNDk4upYXouudjeqv3O2jxS8Agd2liBRFczB4Xu5WWdJKw==}
     peerDependencies:
-      '@fedify/fedify': ^2.3.15
+      '@fedify/fedify': ^2.3.16
 
-  '@fedify/uri-template@2.3.15':
-    resolution: {integrity: sha512-ZbFjheGC8XRsYGTEJOG65vyiOplgNTHBqXb0uJ5y8fdDTFFB6lvjsdhAduzMDH2lnqPmc5Oj5ZvioD1hOvof+w==}
+  '@fedify/uri-template@2.3.16':
+    resolution: {integrity: sha512-AD7kWEaMLQBTdiT3B19goN7nbGys9U3/kUUHlsWdmzlVbyPDYL4TJv77Oic34pvP0/00ONDwLbG3ZrDCwiMTWg==}
     engines: {bun: '>=1.1.0', deno: '>=2.0.0', node: '>=22.0.0'}
 
-  '@fedify/vocab-runtime@2.3.15':
-    resolution: {integrity: sha512-IoKunlFjX24jqDq6HESUSwyAED+rohE19KW8xsdsNqu68Z9D4mJACo3K84FMUhlo1u8M7BiALnYAKz63HYHoqA==}
+  '@fedify/vocab-runtime@2.3.16':
+    resolution: {integrity: sha512-l/koew5Wwz3WZOIGeetH/S6W4rKbmubkDwReMur0+Wl/L2Y2bFo1RSqgmChnktaMHjNFP8vUPBMj9ldDhqD8Aw==}
     engines: {bun: '>=1.1.0', deno: '>=2.0.0', node: '>=22.0.0'}
 
-  '@fedify/vocab-tools@2.3.15':
-    resolution: {integrity: sha512-RMJCywhFbWKPWiFguVadWr3xEAqmhXDcvH0bNObPpMr5Uo1HLwGBde57wkPK0LYTHqhbupug/UwUIHd/1Y9ICA==}
+  '@fedify/vocab-tools@2.3.16':
+    resolution: {integrity: sha512-AkuLxySxtLrZT5BOy1Mq+siCnxcYdxxf3bzm+gBAST/8vHak+OFEA+JMh09KP307U4yqKj/tkJQwanm2WRV2Lg==}
     engines: {bun: '>=1.1.0', deno: '>=2.0.0', node: '>=22.0.0'}
 
-  '@fedify/vocab@2.3.15':
-    resolution: {integrity: sha512-0SdptfcqlZNQ3HLJ7qbWK63UCJ8vU8BbeIpmxVzF/0G7un98fiQAW768Bg0WDoJ0NiP9iFPf0RkmXvU6I0f4zQ==}
+  '@fedify/vocab@2.3.16':
+    resolution: {integrity: sha512-mECAk2bXb4yvIY91lMA9H4TRmHUQ8WAinWvJEG33hgdou4tanOvO6NElCa55q8CsJlcLGMqV5Aa6X4ovzuYs6Q==}
     engines: {bun: '>=1.1.0', deno: '>=2.0.0', node: '>=22.0.0'}
 
-  '@fedify/webfinger@2.3.15':
-    resolution: {integrity: sha512-Q3inYZMHacRsL38UGlX2bJApsRB2KVR4/la3pjDodddTWTN/65OiPzzlB3NByXvs0htz8m3sx6D3WVilUFfZjQ==}
+  '@fedify/webfinger@2.3.16':
+    resolution: {integrity: sha512-NOyY4mmXISm63LwrQKGnW4icKdlxkhDVCAYHkcWqT3KpAsHX1zEtUeClur3Gg1ZW6VeIGEuA+YHRTKdIYhEWgw==}
     engines: {bun: '>=1.1.0', deno: '>=2.0.0', node: '>=22.0.0'}
 
   '@formatjs/fast-memoize@3.1.7':
     resolution: {integrity: sha512-zXfhLpvA6T7+efdt9JLbBwZ00tT7NsBMDVnDu8rpHeNNv8KfRZAMo2gkG0k9lK/Nzc//3kJ9pImsfuJxk3KhUA==}
 
-  '@formatjs/icu-messageformat-parser@3.5.22':
-    resolution: {integrity: sha512-YuwN+dDKgssfuYwtOyGQD0CSn7K46g9cv1Fp0VgKpjZDDFvv8b8crzP990IcJhRPWHhKzCGsbUSJVIguyyFA5A==}
+  '@formatjs/icu-messageformat-parser@3.5.23':
+    resolution: {integrity: sha512-iB1fYfhtSGd8uH9A8b1m01Ujcv6QtQnJasefP3jPApmz72L/zNipzf3BdoinTMd1xuviVChjUJWL60iTwjUQ+w==}
 
-  '@formatjs/icu-skeleton-parser@2.1.12':
-    resolution: {integrity: sha512-ca7tZMLpfHX3sUD7hP6gE/qr6Iq89EDd3ZLeRhbsB7r0UD55DGJq+tmFLzrGrnx5StahUevQmQQVtbDRHsfDHA==}
+  '@formatjs/icu-skeleton-parser@2.1.13':
+    resolution: {integrity: sha512-IdAJ9NrHn7AF0zqncD9UpxQozTYyJtbwwrZnJMEKVxTcOOXtVkUb2XYTpNOGTAv58NCsk0rjRB9G+i2SvBmGAQ==}
 
   '@js-temporal/polyfill@0.5.1':
     resolution: {integrity: sha512-hloP58zRVCRSpgDxmqCWJNlizAlUgJFqG2ypq79DCvyv9tHjRYMDOcPFjzfl/A1/YxDvRCZz8wvZvmapQnKwFQ==}
@@ -397,14 +407,20 @@ packages:
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
 
+  '@opentelemetry/core@2.12.1':
+    resolution: {integrity: sha512-3hr6Pj0/G0oVgIGb97IVcw9BjZ6eudonKjrmQxw7JquyU/XmVbJelkmyoU0sT/OvHGkv+r1tcrwv8MbSX7aKHw==}
+    engines: {node: ^18.19.0 || >=20.6.0}
+    peerDependencies:
+      '@opentelemetry/api': '>=1.0.0 <1.10.0'
+
   '@opentelemetry/core@2.7.1':
     resolution: {integrity: sha512-QAqIj32AtK6+pEVNG7EOVxHdE06RP+FM5qpiEJ4RtDcFIqKUZHYhl7/7UY5efhwmwNAg7j8QbJVBLxMerc0+gw==}
     engines: {node: ^18.19.0 || >=20.6.0}
     peerDependencies:
       '@opentelemetry/api': '>=1.0.0 <1.10.0'
 
-  '@opentelemetry/resources@2.12.0':
-    resolution: {integrity: sha512-+rSRoOdln6NhXTVcBdHSlZxJDNzwxadeweK2ltZO3tVtfp6aklABc06xclDk6ovRR+EiGgIcSbh/6NgjFhnb3A==}
+  '@opentelemetry/resources@2.12.1':
+    resolution: {integrity: sha512-IwrNcuLCvnJAnNLkXxx0Uw+rjBkVW6VGQrhd7PanNf0LavOzkTk9sDAjdqegM7p/VdxefNRrii6d+wBRJfz35g==}
     engines: {node: ^18.19.0 || >=20.6.0}
     peerDependencies:
       '@opentelemetry/api': '>=1.3.0 <1.10.0'
@@ -421,15 +437,14 @@ packages:
     peerDependencies:
       '@opentelemetry/api': '>=1.9.0 <1.10.0'
 
-  '@opentelemetry/sdk-trace-base@2.12.0':
-    resolution: {integrity: sha512-JOERgZCxRM06FEJ5kEWxlSRChah6MmXDx3KwCruqEv/iEyLkTokCSemf2y1w8oIHtfrr8EVTpzebq/31vn2Cpg==}
+  '@opentelemetry/sdk-trace-base@2.12.1':
+    resolution: {integrity: sha512-CMrcqFxTikYmYQCuHToBO4kQvWIseRk2ztzWidTd7VutIxj1rljvJZCZnFPJEGNOS7FvaSmRL21Jeuu3/wrCAQ==}
     engines: {node: ^18.19.0 || >=20.6.0}
-    deprecated: Use @opentelemetry/sdk-trace package
     peerDependencies:
       '@opentelemetry/api': '>=1.3.0 <1.10.0'
 
-  '@opentelemetry/sdk-trace@2.12.0':
-    resolution: {integrity: sha512-ImVuRQ6faOsTi1Wna88s2avgrrf/iDgXPigIeynkUhjstMuoQUDOJXgkez2j1mlU4btjXcXBGa+q7qKFYR3GsA==}
+  '@opentelemetry/sdk-trace@2.12.1':
+    resolution: {integrity: sha512-vANdmCYnn+Ka/alBKxwICMl4Koa+aQBlRC9zAZy+Ig1Obbo3RZt2oiyv+8/gET5rrBBYrO3YniPcXfwZrN01rg==}
     engines: {node: ^18.19.0 || >=20.6.0}
     peerDependencies:
       '@opentelemetry/api': '>=1.3.0 <1.10.0'
@@ -756,8 +771,8 @@ packages:
     resolution: {integrity: sha512-kNOjDqAh7px0XWNI+4QbzoiR/nTkHAWNud2uvnJquD1/x5a7EQZMJT0AczqK0Qn67oY/TTQ1LbUKajZpp3I9tQ==}
     engines: {node: '>=8.0.0'}
 
-  better-sqlite3@13.0.3:
-    resolution: {integrity: sha512-RbOBxmLBG8uvFUc15X9+9SFemKcQ0WBuISBVkpuiaUB2qblC8UWlHEjdWVoZ8AdhSwmoEgsiXKfopX0CQxaACQ==}
+  better-sqlite3@13.2.0:
+    resolution: {integrity: sha512-Z8Q/9x/uNyKxA1v4FNodyItRVRw1TeKBrmj32JhxhR0ceNcBY+wMobt/Bv7M7TzwPAXjnZRtNaEsATnUZSKWZQ==}
     engines: {node: '>=22'}
 
   byte-encodings@1.0.11:
@@ -959,8 +974,8 @@ packages:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
 
-  hono@4.13.13:
-    resolution: {integrity: sha512-CQ46U0ZkAGmbT/4UxdzzGJpacP2IeKgY4a5/tOI9AABbpOMfK739wfDXmv1usCk+3RkKj1hQy4/fjhiwa2xlrA==}
+  hono@4.13.19:
+    resolution: {integrity: sha512-KmXvQAXwcAHV+muzbIwoJ23niEB5nMoDVr9WcRkU8mvjUECm/1+7v4Jgp7P7a+H6MLFrh+vXrGonGrGS+RQfkA==}
     engines: {node: '>=16.9.0'}
 
   html-entities@2.6.0:
@@ -992,8 +1007,8 @@ packages:
     resolution: {integrity: sha512-Ju0Bz/cEia55xDwUWEa8+olFpCiQoypjnQySseKtmjNrnps3P+xfpUmGr90T7yjlVJmOtybRvPXhKMbHr+fWnw==}
     engines: {node: '>= 0.10'}
 
-  intl-messageformat@12.1.4:
-    resolution: {integrity: sha512-JUkmv3cAEyijN3oiRiV3ctel7yVMuUCgfh7Pu8pj1/z6L1DSEPRyhuMaLjVw3pGmGJ5RDH54WVFxfMHZWTwyHw==}
+  intl-messageformat@12.2.0:
+    resolution: {integrity: sha512-zFzW80iYSSJm4V185g3ItJQ96lBZ2RDO8O8qmRiPAAVKYXJeHfDQN2ITdtLlV+CjSi9Lo7zVW9xGt9CPCx7J6A==}
 
   ipaddr.js@1.9.1:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
@@ -1431,6 +1446,19 @@ snapshots:
       yargs-parser: 22.0.0
       youch: 4.1.1
 
+  '@adonisjs/ace@14.1.2(youch@4.1.1)':
+    dependencies:
+      '@poppinss/cliui': 6.8.1
+      '@poppinss/hooks': 7.3.1
+      '@poppinss/macroable': 1.1.2
+      '@poppinss/prompts': 3.1.6
+      '@poppinss/utils': 7.1.2
+      fastest-levenshtein: 1.0.16
+      jsonschema: 1.5.0
+      string-width: 8.3.0
+      yargs-parser: 22.0.0
+      youch: 4.1.1
+
   '@adonisjs/application@9.1.1(@adonisjs/config@6.1.0)(@adonisjs/fold@11.1.0)':
     dependencies:
       '@adonisjs/config': 6.1.0
@@ -1460,7 +1488,7 @@ snapshots:
     dependencies:
       '@poppinss/utils': 7.1.2
 
-  '@adonisjs/core@7.6.0(supports-color@10.2.2)(youch@4.1.1)':
+  '@adonisjs/core@7.7.0(supports-color@10.2.2)(youch@4.1.1)':
     dependencies:
       '@adonisjs/ace': 14.1.1(youch@4.1.1)
       '@adonisjs/application': 9.1.1(@adonisjs/config@6.1.0)(@adonisjs/fold@11.1.0)
@@ -1492,6 +1520,12 @@ snapshots:
       - supports-color
 
   '@adonisjs/env@7.1.0':
+    dependencies:
+      '@poppinss/utils': 7.1.2
+      '@poppinss/validator-lite': 2.1.2
+      split-lines: 3.0.0
+
+  '@adonisjs/env@7.1.1':
     dependencies:
       '@poppinss/utils': 7.1.2
       '@poppinss/validator-lite': 2.1.2
@@ -1562,10 +1596,10 @@ snapshots:
       abstract-logging: 2.0.1
       pino: 10.4.0
 
-  '@adonisjs/lucid@22.4.2(@adonisjs/core@7.6.0(supports-color@10.2.2)(youch@4.1.1))(better-sqlite3@13.0.3)(luxon@3.7.2)(supports-color@10.2.2)':
+  '@adonisjs/lucid@22.5.0(@adonisjs/core@7.7.0(supports-color@10.2.2)(youch@4.1.1))(better-sqlite3@13.2.0)(luxon@3.7.2)(supports-color@10.2.2)':
     dependencies:
-      '@adonisjs/core': 7.6.0(supports-color@10.2.2)(youch@4.1.1)
-      '@adonisjs/presets': 3.0.0(@adonisjs/core@7.6.0(supports-color@10.2.2)(youch@4.1.1))
+      '@adonisjs/core': 7.7.0(supports-color@10.2.2)(youch@4.1.1)
+      '@adonisjs/presets': 3.0.0(@adonisjs/core@7.7.0(supports-color@10.2.2)(youch@4.1.1))
       '@faker-js/faker': 10.6.0
       '@poppinss/hooks': 7.3.1
       '@poppinss/macroable': 1.1.2
@@ -1575,8 +1609,8 @@ snapshots:
       fast-deep-equal: 3.1.3
       igniculus: 1.5.0
       kleur: 4.1.5
-      knex: 3.3.0(better-sqlite3@13.0.3)(supports-color@10.2.2)
-      knex-dynamic-connection: 5.1.1(better-sqlite3@13.0.3)(supports-color@10.2.2)
+      knex: 3.3.0(better-sqlite3@13.2.0)(supports-color@10.2.2)
+      knex-dynamic-connection: 5.1.1(better-sqlite3@13.2.0)(supports-color@10.2.2)
       pretty-hrtime: 1.0.3
       slash: 5.1.0
       tarn: 3.1.2
@@ -1594,9 +1628,9 @@ snapshots:
       - supports-color
       - tedious
 
-  '@adonisjs/presets@3.0.0(@adonisjs/core@7.6.0(supports-color@10.2.2)(youch@4.1.1))':
+  '@adonisjs/presets@3.0.0(@adonisjs/core@7.7.0(supports-color@10.2.2)(youch@4.1.1))':
     dependencies:
-      '@adonisjs/core': 7.6.0(supports-color@10.2.2)(youch@4.1.1)
+      '@adonisjs/core': 7.7.0(supports-color@10.2.2)(youch@4.1.1)
 
   '@adonisjs/repl@5.0.0':
     dependencies:
@@ -1605,47 +1639,47 @@ snapshots:
 
   '@arr/every@1.0.1': {}
 
-  '@biomejs/biome@2.6.4':
+  '@biomejs/biome@2.6.8':
     optionalDependencies:
-      '@biomejs/cli-android-arm64': 2.6.4
-      '@biomejs/cli-android-x64': 2.6.4
-      '@biomejs/cli-darwin-arm64': 2.6.4
-      '@biomejs/cli-darwin-x64': 2.6.4
-      '@biomejs/cli-linux-arm64': 2.6.4
-      '@biomejs/cli-linux-arm64-musl': 2.6.4
-      '@biomejs/cli-linux-x64': 2.6.4
-      '@biomejs/cli-linux-x64-musl': 2.6.4
-      '@biomejs/cli-win32-arm64': 2.6.4
-      '@biomejs/cli-win32-x64': 2.6.4
+      '@biomejs/cli-android-arm64': 2.6.8
+      '@biomejs/cli-android-x64': 2.6.8
+      '@biomejs/cli-darwin-arm64': 2.6.8
+      '@biomejs/cli-darwin-x64': 2.6.8
+      '@biomejs/cli-linux-arm64': 2.6.8
+      '@biomejs/cli-linux-arm64-musl': 2.6.8
+      '@biomejs/cli-linux-x64': 2.6.8
+      '@biomejs/cli-linux-x64-musl': 2.6.8
+      '@biomejs/cli-win32-arm64': 2.6.8
+      '@biomejs/cli-win32-x64': 2.6.8
 
-  '@biomejs/cli-android-arm64@2.6.4':
+  '@biomejs/cli-android-arm64@2.6.8':
     optional: true
 
-  '@biomejs/cli-android-x64@2.6.4':
+  '@biomejs/cli-android-x64@2.6.8':
     optional: true
 
-  '@biomejs/cli-darwin-arm64@2.6.4':
+  '@biomejs/cli-darwin-arm64@2.6.8':
     optional: true
 
-  '@biomejs/cli-darwin-x64@2.6.4':
+  '@biomejs/cli-darwin-x64@2.6.8':
     optional: true
 
-  '@biomejs/cli-linux-arm64-musl@2.6.4':
+  '@biomejs/cli-linux-arm64-musl@2.6.8':
     optional: true
 
-  '@biomejs/cli-linux-arm64@2.6.4':
+  '@biomejs/cli-linux-arm64@2.6.8':
     optional: true
 
-  '@biomejs/cli-linux-x64-musl@2.6.4':
+  '@biomejs/cli-linux-x64-musl@2.6.8':
     optional: true
 
-  '@biomejs/cli-linux-x64@2.6.4':
+  '@biomejs/cli-linux-x64@2.6.8':
     optional: true
 
-  '@biomejs/cli-win32-arm64@2.6.4':
+  '@biomejs/cli-win32-arm64@2.6.8':
     optional: true
 
-  '@biomejs/cli-win32-x64@2.6.4':
+  '@biomejs/cli-win32-x64@2.6.8':
     optional: true
 
   '@borewit/text-codec@0.2.2': {}
@@ -1668,24 +1702,24 @@ snapshots:
 
   '@faker-js/faker@10.6.0': {}
 
-  '@fedify/botkit-sqlite@0.5.8(@fedify/botkit@0.5.8)':
+  '@fedify/botkit-sqlite@0.5.9(@fedify/botkit@0.5.9)':
     dependencies:
-      '@fedify/botkit': 0.5.8
-      '@fedify/fedify': 2.3.15
-      '@fedify/vocab': 2.3.15
+      '@fedify/botkit': 0.5.9
+      '@fedify/fedify': 2.3.16
+      '@fedify/vocab': 2.3.16
       '@js-temporal/polyfill': 0.5.1
       '@logtape/logtape': 2.4.2
 
-  '@fedify/botkit@0.5.8':
+  '@fedify/botkit@0.5.9':
     dependencies:
-      '@fedify/fedify': 2.3.15
+      '@fedify/fedify': 2.3.16
       '@fedify/markdown-it-hashtag': 0.3.0
       '@fedify/markdown-it-mention': 0.3.0
-      '@fedify/vocab': 2.3.15
-      '@fedify/vocab-runtime': 2.3.15
+      '@fedify/vocab': 2.3.16
+      '@fedify/vocab-runtime': 2.3.16
       '@js-temporal/polyfill': 0.5.1
       '@logtape/logtape': 2.4.2
-      hono: 4.13.13
+      hono: 4.13.19
       html-entities: 2.6.0
       markdown-it: 14.3.3
       mime-db: 1.54.0
@@ -1694,18 +1728,18 @@ snapshots:
       x-forwarded-fetch: 0.2.0
       xss: 1.0.16
 
-  '@fedify/fedify@2.3.15':
+  '@fedify/fedify@2.3.16':
     dependencies:
-      '@fedify/uri-template': 2.3.15
-      '@fedify/vocab': 2.3.15
-      '@fedify/vocab-runtime': 2.3.15
-      '@fedify/webfinger': 2.3.15
+      '@fedify/uri-template': 2.3.16
+      '@fedify/vocab': 2.3.16
+      '@fedify/vocab-runtime': 2.3.16
+      '@fedify/webfinger': 2.3.16
       '@js-temporal/polyfill': 0.5.1
       '@logtape/logtape': 2.4.2
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/core': 2.12.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/sdk-metrics': 2.7.1(@opentelemetry/api@1.9.1)
-      '@opentelemetry/sdk-trace-base': 2.12.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/sdk-trace-base': 2.12.1(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.43.0
       byte-encodings: 1.0.11
       es-toolkit: 1.46.1
@@ -1722,16 +1756,16 @@ snapshots:
     dependencies:
       markdown-it: 14.3.3
 
-  '@fedify/sqlite@2.3.15(@fedify/fedify@2.3.15)':
+  '@fedify/sqlite@2.3.16(@fedify/fedify@2.3.16)':
     dependencies:
-      '@fedify/fedify': 2.3.15
+      '@fedify/fedify': 2.3.16
       '@js-temporal/polyfill': 0.5.1
       '@logtape/logtape': 2.4.2
       es-toolkit: 1.52.0
 
-  '@fedify/uri-template@2.3.15': {}
+  '@fedify/uri-template@2.3.16': {}
 
-  '@fedify/vocab-runtime@2.3.15':
+  '@fedify/vocab-runtime@2.3.16':
     dependencies:
       '@js-temporal/polyfill': 0.5.1
       '@logtape/logtape': 2.4.2
@@ -1743,18 +1777,18 @@ snapshots:
       pkijs: 3.4.3
       undici: 7.30.1
 
-  '@fedify/vocab-tools@2.3.15':
+  '@fedify/vocab-tools@2.3.16':
     dependencies:
       '@cfworker/json-schema': 4.1.1
       byte-encodings: 1.0.11
       es-toolkit: 1.46.1
       yaml: 2.9.1
 
-  '@fedify/vocab@2.3.15':
+  '@fedify/vocab@2.3.16':
     dependencies:
-      '@fedify/vocab-runtime': 2.3.15
-      '@fedify/vocab-tools': 2.3.15
-      '@fedify/webfinger': 2.3.15
+      '@fedify/vocab-runtime': 2.3.16
+      '@fedify/vocab-tools': 2.3.16
+      '@fedify/webfinger': 2.3.16
       '@js-temporal/polyfill': 0.5.1
       '@logtape/logtape': 2.4.2
       '@multiformats/base-x': 4.0.1
@@ -1764,20 +1798,20 @@ snapshots:
       jsonld: 9.0.0
       pkijs: 3.4.3
 
-  '@fedify/webfinger@2.3.15':
+  '@fedify/webfinger@2.3.16':
     dependencies:
-      '@fedify/vocab-runtime': 2.3.15
+      '@fedify/vocab-runtime': 2.3.16
       '@logtape/logtape': 2.4.2
       '@opentelemetry/api': 1.9.1
       es-toolkit: 1.46.1
 
   '@formatjs/fast-memoize@3.1.7': {}
 
-  '@formatjs/icu-messageformat-parser@3.5.22':
+  '@formatjs/icu-messageformat-parser@3.5.23':
     dependencies:
-      '@formatjs/icu-skeleton-parser': 2.1.12
+      '@formatjs/icu-skeleton-parser': 2.1.13
 
-  '@formatjs/icu-skeleton-parser@2.1.12': {}
+  '@formatjs/icu-skeleton-parser@2.1.13': {}
 
   '@js-temporal/polyfill@0.5.1':
     dependencies:
@@ -1796,15 +1830,20 @@ snapshots:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/semantic-conventions': 1.43.0
 
+  '@opentelemetry/core@2.12.1(@opentelemetry/api@1.9.1)':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+      '@opentelemetry/semantic-conventions': 1.43.0
+
   '@opentelemetry/core@2.7.1(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/semantic-conventions': 1.43.0
 
-  '@opentelemetry/resources@2.12.0(@opentelemetry/api@1.9.1)':
+  '@opentelemetry/resources@2.12.1(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
-      '@opentelemetry/core': 2.12.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/core': 2.12.1(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.43.0
 
   '@opentelemetry/resources@2.7.1(@opentelemetry/api@1.9.1)':
@@ -1819,19 +1858,19 @@ snapshots:
       '@opentelemetry/core': 2.7.1(@opentelemetry/api@1.9.1)
       '@opentelemetry/resources': 2.7.1(@opentelemetry/api@1.9.1)
 
-  '@opentelemetry/sdk-trace-base@2.12.0(@opentelemetry/api@1.9.1)':
+  '@opentelemetry/sdk-trace-base@2.12.1(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
-      '@opentelemetry/core': 2.12.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/resources': 2.12.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/sdk-trace': 2.12.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/core': 2.12.1(@opentelemetry/api@1.9.1)
+      '@opentelemetry/resources': 2.12.1(@opentelemetry/api@1.9.1)
+      '@opentelemetry/sdk-trace': 2.12.1(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.43.0
 
-  '@opentelemetry/sdk-trace@2.12.0(@opentelemetry/api@1.9.1)':
+  '@opentelemetry/sdk-trace@2.12.1(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
-      '@opentelemetry/core': 2.12.0(@opentelemetry/api@1.9.1)
-      '@opentelemetry/resources': 2.12.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/core': 2.12.1(@opentelemetry/api@1.9.1)
+      '@opentelemetry/resources': 2.12.1(@opentelemetry/api@1.9.1)
       '@opentelemetry/semantic-conventions': 1.43.0
 
   '@opentelemetry/semantic-conventions@1.43.0': {}
@@ -2066,7 +2105,7 @@ snapshots:
 
   atomic-sleep@1.0.0: {}
 
-  better-sqlite3@13.0.3:
+  better-sqlite3@13.2.0:
     dependencies:
       node-addon-api: 8.9.2
 
@@ -2203,7 +2242,7 @@ snapshots:
 
   he@1.2.0: {}
 
-  hono@4.13.13: {}
+  hono@4.13.19: {}
 
   html-entities@2.6.0: {}
 
@@ -2229,10 +2268,10 @@ snapshots:
 
   interpret@2.2.0: {}
 
-  intl-messageformat@12.1.4:
+  intl-messageformat@12.2.0:
     dependencies:
       '@formatjs/fast-memoize': 3.1.7
-      '@formatjs/icu-messageformat-parser': 3.5.22
+      '@formatjs/icu-messageformat-parser': 3.5.23
 
   ipaddr.js@1.9.1: {}
 
@@ -2267,10 +2306,10 @@ snapshots:
 
   kleur@4.1.5: {}
 
-  knex-dynamic-connection@5.1.1(better-sqlite3@13.0.3)(supports-color@10.2.2):
+  knex-dynamic-connection@5.1.1(better-sqlite3@13.2.0)(supports-color@10.2.2):
     dependencies:
       debug: 4.4.3(supports-color@10.2.2)
-      knex: 3.3.0(better-sqlite3@13.0.3)(supports-color@10.2.2)
+      knex: 3.3.0(better-sqlite3@13.2.0)(supports-color@10.2.2)
     transitivePeerDependencies:
       - better-sqlite3
       - mariadb
@@ -2283,7 +2322,7 @@ snapshots:
       - supports-color
       - tedious
 
-  knex@3.3.0(better-sqlite3@13.0.3)(supports-color@10.2.2):
+  knex@3.3.0(better-sqlite3@13.2.0)(supports-color@10.2.2):
     dependencies:
       colorette: 2.0.19
       commander: 10.0.1
@@ -2300,7 +2339,7 @@ snapshots:
       tarn: 3.1.2
       tildify: 2.0.0
     optionalDependencies:
-      better-sqlite3: 13.0.3
+      better-sqlite3: 13.2.0
     transitivePeerDependencies:
       - supports-color
 
